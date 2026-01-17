@@ -334,7 +334,7 @@ export default function CheckoutModal({
   return (
     <>
       <div 
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4"
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-3 sm:p-4"
         onClick={(e) => {
           // Close modal when clicking backdrop (only if not loading)
           if (!loading && e.target === e.currentTarget) {
@@ -343,13 +343,13 @@ export default function CheckoutModal({
         }}
       >
         <div 
-          className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+          className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="sticky top-0 bg-gradient-to-br from-gold-50 to-gold-100 border-b border-gold-200 p-6 rounded-t-3xl">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-text-primary">
+          <div className="sticky top-0 bg-gradient-to-br from-gold-50 to-gold-100 border-b border-gold-200 p-4 sm:p-6 rounded-t-2xl sm:rounded-t-3xl">
+            <div className="flex items-center justify-between gap-2">
+              <h2 className="text-xl sm:text-2xl font-bold text-text-primary">
                 {step === 'provider' ? t('subscription.choosePayment') : t('subscription.completePayment')}
               </h2>
               <button
@@ -368,11 +368,11 @@ export default function CheckoutModal({
                     onClose()
                   }
                 }}
-                className="p-2 hover:bg-white/50 rounded-lg transition-colors z-10 relative cursor-pointer"
+                className="p-1.5 sm:p-2 hover:bg-white/50 rounded-lg transition-colors z-10 relative cursor-pointer flex-shrink-0"
                 type="button"
                 aria-label="Close"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -380,17 +380,17 @@ export default function CheckoutModal({
           </div>
 
           {/* Content */}
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             {step === 'provider' ? (
-              <div className="space-y-4">
-                <div className="bg-beige-50 rounded-xl p-4 mb-6">
-                  <p className="text-text-secondary text-sm mb-2">
+              <div className="space-y-3 sm:space-y-4">
+                <div className="bg-beige-50 rounded-lg sm:rounded-xl p-3 sm:p-4 mb-4 sm:mb-6">
+                  <p className="text-text-secondary text-xs sm:text-sm mb-1.5 sm:mb-2">
                     {t('subscription.plan')}: <span className="font-semibold">{planType}</span>
                   </p>
-                  <p className="text-text-secondary text-sm mb-2">
+                  <p className="text-text-secondary text-xs sm:text-sm mb-1.5 sm:mb-2">
                     {t('subscription.billingPeriod')}: <span className="font-semibold">{billingPeriod}</span>
                   </p>
-                  <p className="text-2xl font-bold text-gold-600">
+                  <p className="text-xl sm:text-2xl font-bold text-gold-600">
                     {/* Show INR amount - always convert USD to INR for display */}
                     {currency === 'USD' 
                       ? `₹${inrAmount.toFixed(2)}` 
@@ -398,34 +398,34 @@ export default function CheckoutModal({
                       ? `₹${amount.toFixed(2)}`
                       : `${currency} ${amount.toFixed(2)}`}
                     {currency === 'USD' && (
-                      <span className="text-sm text-text-secondary ml-2 font-normal">
+                      <span className="text-xs sm:text-sm text-text-secondary ml-1 sm:ml-2 font-normal">
                         (≈ ${amount.toFixed(2)})
                       </span>
                     )}
                   </p>
                 </div>
 
-                <h3 className="text-lg font-semibold text-text-primary mb-4">
+                <h3 className="text-base sm:text-lg font-semibold text-text-primary mb-3 sm:mb-4">
                   {t('subscription.selectPaymentMethod')}
                 </h3>
 
-                <div className="grid gap-4">
+                <div className="grid gap-3 sm:gap-4">
                   {/* Stripe */}
                   <button
                     onClick={() => handleProviderSelect('stripe')}
                     disabled={loading}
-                    className="flex items-center gap-4 p-4 border-2 border-beige-300 rounded-xl hover:border-gold-400 hover:bg-gold-50 transition-all disabled:opacity-50"
+                    className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 border-2 border-beige-300 rounded-lg sm:rounded-xl hover:border-gold-400 hover:bg-gold-50 transition-all disabled:opacity-50"
                   >
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                      <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.654.605 5.933 1.242l1.42-3.829c-1.257-.515-2.445-.899-4.582-.899-3.74 0-6.162 2.003-6.162 4.903 0 2.838 2.052 4.106 3.896 4.838 2.172.806 3.356 1.426 3.356 2.409 0 .98-.84 1.545-2.227 1.545-1.901 0-4.654-.731-6.162-1.545l-1.42 3.829c1.5.605 3.58 1.242 6.162 1.242 3.896 0 6.162-2.003 6.162-4.903 0-2.838-2.052-4.106-3.896-4.838z"/>
                       </svg>
                     </div>
-                    <div className="flex-1 text-left">
-                      <p className="font-semibold text-text-primary">Card Payment</p>
-                      <p className="text-sm text-text-secondary">Visa, Mastercard, Amex</p>
+                    <div className="flex-1 text-left min-w-0">
+                      <p className="font-semibold text-text-primary text-sm sm:text-base">Card Payment</p>
+                      <p className="text-xs sm:text-sm text-text-secondary">Visa, Mastercard, Amex</p>
                     </div>
-                    <svg className="w-6 h-6 text-text-tertiary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 sm:w-6 sm:h-6 text-text-tertiary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </button>
@@ -434,16 +434,16 @@ export default function CheckoutModal({
                   <button
                     onClick={() => handleProviderSelect('razorpay')}
                     disabled={loading}
-                    className="flex items-center gap-4 p-4 border-2 border-beige-300 rounded-xl hover:border-gold-400 hover:bg-gold-50 transition-all disabled:opacity-50"
+                    className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 border-2 border-beige-300 rounded-lg sm:rounded-xl hover:border-gold-400 hover:bg-gold-50 transition-all disabled:opacity-50"
                   >
-                    <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
-                      <span className="text-white font-bold text-lg">R</span>
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <span className="text-white font-bold text-base sm:text-lg">R</span>
                     </div>
-                    <div className="flex-1 text-left">
-                      <p className="font-semibold text-text-primary">Razorpay</p>
-                      <p className="text-sm text-text-secondary">UPI, Cards, Net Banking, Wallets</p>
+                    <div className="flex-1 text-left min-w-0">
+                      <p className="font-semibold text-text-primary text-sm sm:text-base">Razorpay</p>
+                      <p className="text-xs sm:text-sm text-text-secondary">UPI, Cards, Net Banking, Wallets</p>
                     </div>
-                    <svg className="w-6 h-6 text-text-tertiary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 sm:w-6 sm:h-6 text-text-tertiary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </button>
@@ -452,32 +452,32 @@ export default function CheckoutModal({
                   <button
                     onClick={() => handleProviderSelect('bitcoin')}
                     disabled={loading}
-                    className="flex items-center gap-4 p-4 border-2 border-beige-300 rounded-xl hover:border-gold-400 hover:bg-gold-50 transition-all disabled:opacity-50"
+                    className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 border-2 border-beige-300 rounded-lg sm:rounded-xl hover:border-gold-400 hover:bg-gold-50 transition-all disabled:opacity-50"
                   >
-                    <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center">
-                      <span className="text-white font-bold text-lg">₿</span>
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <span className="text-white font-bold text-base sm:text-lg">₿</span>
                     </div>
-                    <div className="flex-1 text-left">
-                      <p className="font-semibold text-text-primary">Bitcoin</p>
-                      <p className="text-sm text-text-secondary">Cryptocurrency payment</p>
+                    <div className="flex-1 text-left min-w-0">
+                      <p className="font-semibold text-text-primary text-sm sm:text-base">Bitcoin</p>
+                      <p className="text-xs sm:text-sm text-text-secondary">Cryptocurrency payment</p>
                     </div>
-                    <svg className="w-6 h-6 text-text-tertiary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 sm:w-6 sm:h-6 text-text-tertiary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </button>
                 </div>
               </div>
             ) : (
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 <div className="text-center">
-                  <p className="text-text-secondary mb-4">
+                  <p className="text-text-secondary mb-3 sm:mb-4 text-sm sm:text-base">
                     {t('subscription.completingPayment')}...
                   </p>
                   {selectedProvider === 'stripe' && (
                     <button
                       onClick={handleStripePayment}
                       disabled={loading}
-                      className="w-full px-6 py-4 bg-gradient-to-r from-gold-500 to-gold-600 text-white rounded-xl font-semibold hover:from-gold-600 hover:to-gold-700 transition-all disabled:opacity-50"
+                      className="w-full px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-gold-500 to-gold-600 text-white rounded-lg sm:rounded-xl font-semibold hover:from-gold-600 hover:to-gold-700 transition-all disabled:opacity-50 text-sm sm:text-base"
                     >
                       {loading ? t('common.loading') : t('subscription.payNow')}
                     </button>
@@ -486,7 +486,7 @@ export default function CheckoutModal({
                     <button
                       onClick={handleRazorpayPayment}
                       disabled={loading}
-                      className="w-full px-6 py-4 bg-gradient-to-r from-gold-500 to-gold-600 text-white rounded-xl font-semibold hover:from-gold-600 hover:to-gold-700 transition-all disabled:opacity-50"
+                      className="w-full px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-gold-500 to-gold-600 text-white rounded-lg sm:rounded-xl font-semibold hover:from-gold-600 hover:to-gold-700 transition-all disabled:opacity-50 text-sm sm:text-base"
                     >
                       {loading ? t('common.loading') : t('subscription.payNow')}
                     </button>
@@ -495,7 +495,7 @@ export default function CheckoutModal({
                     <button
                       onClick={handleBitcoinPayment}
                       disabled={loading}
-                      className="w-full px-6 py-4 bg-gradient-to-r from-gold-500 to-gold-600 text-white rounded-xl font-semibold hover:from-gold-600 hover:to-gold-700 transition-all disabled:opacity-50"
+                      className="w-full px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-gold-500 to-gold-600 text-white rounded-lg sm:rounded-xl font-semibold hover:from-gold-600 hover:to-gold-700 transition-all disabled:opacity-50 text-sm sm:text-base"
                     >
                       {loading ? t('common.loading') : t('subscription.payNow')}
                     </button>

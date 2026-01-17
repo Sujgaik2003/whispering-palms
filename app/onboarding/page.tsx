@@ -115,40 +115,40 @@ export default function OnboardingPage() {
   ]
 
   return (
-    <main className="min-h-screen bg-gradient-soft p-4 flex items-center justify-center py-12 relative">
-      <div className="fixed top-4 right-4 z-50">
+    <main className="min-h-screen bg-gradient-soft p-3 sm:p-4 flex items-center justify-center py-8 sm:py-12 relative">
+      <div className="fixed top-3 right-3 sm:top-4 sm:right-4 z-50">
         <LanguageSwitcher />
       </div>
-      <div className="max-w-2xl mx-auto w-full animate-scale-in">
+      <div className="max-w-2xl mx-auto w-full animate-scale-in px-2 sm:px-4">
         {/* Progress Bar */}
-        <div className="mb-8">
-          <div className="flex justify-between mb-3">
-            <span className="text-text-primary font-semibold">{t('onboarding.step')} {currentStep} {t('onboarding.of')} 3</span>
-            <span className="text-text-secondary">
+        <div className="mb-6 sm:mb-8">
+          <div className="flex justify-between mb-2 sm:mb-3">
+            <span className="text-text-primary font-semibold text-sm sm:text-base">{t('onboarding.step')} {currentStep} {t('onboarding.of')} 3</span>
+            <span className="text-text-secondary text-sm sm:text-base">
               {Math.round((currentStep / 3) * 100)}%
             </span>
           </div>
-          <div className="w-full bg-beige-200 rounded-full h-2 overflow-hidden">
+          <div className="w-full bg-beige-200 rounded-full h-1.5 sm:h-2 overflow-hidden">
             <div
-              className="bg-gradient-to-r from-gold-500 to-gold-600 h-2 rounded-full transition-all duration-500 ease-out"
+              className="bg-gradient-to-r from-gold-500 to-gold-600 h-1.5 sm:h-2 rounded-full transition-all duration-500 ease-out"
               style={{ width: `${(currentStep / 3) * 100}%` }}
             />
           </div>
         </div>
 
         {/* Form Card */}
-        <div className="bg-white/80 backdrop-blur-lg rounded-3xl p-8 md:p-10 shadow-soft-xl border border-beige-300/50">
+        <div className="bg-white/80 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 shadow-soft-xl border border-beige-300/50">
           {/* Step 1: Basic Info */}
           {currentStep === 1 && (
-            <div className="space-y-6 animate-slide-up">
-              <div className="text-center mb-6">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-peach-400 to-peach-500 rounded-2xl mb-4 shadow-soft">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="space-y-4 sm:space-y-6 animate-slide-up">
+              <div className="text-center mb-4 sm:mb-6">
+                <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-peach-400 to-peach-500 rounded-xl sm:rounded-2xl mb-3 sm:mb-4 shadow-soft">
+                  <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                 </div>
-                <h2 className="text-3xl font-bold text-text-primary mb-2 font-serif">{t('onboarding.welcome')}</h2>
-                <p className="text-text-secondary">
+                <h2 className="text-2xl sm:text-3xl font-bold text-text-primary mb-2 font-serif">{t('onboarding.welcome')}</h2>
+                <p className="text-text-secondary text-sm sm:text-base">
                   {t('onboarding.welcomeDesc')}
                 </p>
               </div>
@@ -196,20 +196,20 @@ export default function OnboardingPage() {
 
           {/* Step 2: Birth Details */}
           {currentStep === 2 && (
-            <div className="space-y-6 animate-slide-up">
-              <div className="text-center mb-6">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-gold-400 to-gold-600 rounded-2xl mb-4 shadow-soft">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="space-y-4 sm:space-y-6 animate-slide-up">
+              <div className="text-center mb-4 sm:mb-6">
+                <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-gold-400 to-gold-600 rounded-xl sm:rounded-2xl mb-3 sm:mb-4 shadow-soft">
+                  <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <h2 className="text-3xl font-bold text-text-primary mb-2 font-serif">{t('onboarding.birthDetails')}</h2>
-                <p className="text-text-secondary">
+                <h2 className="text-2xl sm:text-3xl font-bold text-text-primary mb-2 font-serif">{t('onboarding.birthDetails')}</h2>
+                <p className="text-text-secondary text-sm sm:text-base">
                   {t('onboarding.birthDetailsDesc')}
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className="block text-text-primary font-medium mb-2 text-sm">
                     {t('onboarding.dateOfBirth')} *
@@ -263,15 +263,15 @@ export default function OnboardingPage() {
 
           {/* Step 3: Consent */}
           {currentStep === 3 && (
-            <div className="space-y-6 animate-slide-up">
-              <div className="text-center mb-6">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-sage-400 to-sage-500 rounded-2xl mb-4 shadow-soft">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="space-y-4 sm:space-y-6 animate-slide-up">
+              <div className="text-center mb-4 sm:mb-6">
+                <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-sage-400 to-sage-500 rounded-xl sm:rounded-2xl mb-3 sm:mb-4 shadow-soft">
+                  <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                   </svg>
                 </div>
-                <h2 className="text-3xl font-bold text-text-primary mb-2 font-serif">{t('onboarding.consent')}</h2>
-                <p className="text-text-secondary">
+                <h2 className="text-2xl sm:text-3xl font-bold text-text-primary mb-2 font-serif">{t('onboarding.consent')}</h2>
+                <p className="text-text-secondary text-sm sm:text-base">
                   {t('onboarding.consentDesc')}
                 </p>
               </div>
@@ -315,11 +315,11 @@ export default function OnboardingPage() {
           )}
 
           {/* Navigation Buttons */}
-          <div className="flex justify-between mt-8 pt-6 border-t border-beige-200">
+          <div className="flex justify-between mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-beige-200 gap-3">
             <button
               onClick={handleBack}
               disabled={currentStep === 1}
-              className="px-6 py-3 bg-white border-2 border-beige-300 hover:border-gold-400 text-text-primary rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="px-4 sm:px-6 py-2.5 sm:py-3 bg-white border-2 border-beige-300 hover:border-gold-400 text-text-primary rounded-lg sm:rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all text-sm sm:text-base"
             >
               {t('onboarding.back')}
             </button>
@@ -327,7 +327,7 @@ export default function OnboardingPage() {
             <button
               onClick={handleNext}
               disabled={!isStepValid() || loading}
-              className="px-8 py-3 bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-white rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 ease-out shadow-soft hover:shadow-soft-lg hover:shadow-gold-500/30 transform hover:scale-[1.03] active:scale-[0.98]"
+              className="px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-white rounded-lg sm:rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 ease-out shadow-soft hover:shadow-soft-lg hover:shadow-gold-500/30 transform hover:scale-[1.03] active:scale-[0.98] text-sm sm:text-base"
             >
               {loading ? (
                 <span className="flex items-center gap-2">

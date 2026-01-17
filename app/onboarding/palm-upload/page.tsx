@@ -497,7 +497,7 @@ export default function PalmUploadPage() {
               return (
                 <div
                   key={value}
-                  className="border-2 border-dashed border-beige-300 rounded-xl p-6 bg-ivory-50 hover:border-gold-400 transition-all"
+                  className="border-2 border-dashed border-beige-300 rounded-lg sm:rounded-xl p-4 sm:p-6 bg-ivory-50 hover:border-gold-400 transition-all"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div>
@@ -530,7 +530,7 @@ export default function PalmUploadPage() {
                       <button
                         onClick={() => removeImage(image.id, value)}
                         disabled={image.uploading}
-                        className="w-full px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl text-sm font-semibold disabled:opacity-50 transition-colors shadow-soft"
+                        className="w-full px-3 sm:px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg sm:rounded-xl text-xs sm:text-sm font-semibold disabled:opacity-50 transition-colors shadow-soft"
                       >
                         {t('palm.remove')}
                       </button>
@@ -563,7 +563,7 @@ export default function PalmUploadPage() {
                       <div className="flex gap-2">
                         <button
                           onClick={() => capturePhoto(value)}
-                          className="flex-1 px-4 py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-xl font-semibold transition-colors flex items-center justify-center gap-2 shadow-soft"
+                          className="flex-1 px-3 sm:px-4 py-2 sm:py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-lg sm:rounded-xl font-semibold transition-colors flex items-center justify-center gap-1.5 sm:gap-2 shadow-soft text-xs sm:text-sm"
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
@@ -573,7 +573,7 @@ export default function PalmUploadPage() {
                         </button>
                         <button
                           onClick={stopCamera}
-                          className="px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-xl font-semibold transition-colors shadow-soft"
+                          className="px-3 sm:px-4 py-2 sm:py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-lg sm:rounded-xl font-semibold transition-colors shadow-soft text-xs sm:text-sm"
                         >
                           {t('palm.cancel')}
                         </button>
@@ -592,28 +592,28 @@ export default function PalmUploadPage() {
                             onChange={(e) => handleFileSelect(value, e.target.files?.[0] || null)}
                             className="hidden"
                           />
-                          <div className="border-2 border-dashed border-beige-300 rounded-xl p-6 text-center hover:border-gold-400 transition-colors bg-white hover:bg-beige-50">
-                            <div className="flex justify-center mb-2">
-                              <svg className="w-8 h-8 text-gold-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <div className="border-2 border-dashed border-beige-300 rounded-lg sm:rounded-xl p-4 sm:p-6 text-center hover:border-gold-400 transition-colors bg-white hover:bg-beige-50">
+                            <div className="flex justify-center mb-1.5 sm:mb-2">
+                              <svg className="w-6 h-6 sm:w-8 sm:h-8 text-gold-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                               </svg>
                             </div>
-                            <div className="text-text-primary font-semibold text-sm mb-1">{t('palm.gallery')}</div>
-                            <div className="text-text-tertiary text-xs">{t('palm.chooseFile')}</div>
+                            <div className="text-text-primary font-semibold text-xs sm:text-sm mb-1">{t('palm.gallery')}</div>
+                            <div className="text-text-tertiary text-[10px] sm:text-xs">{t('palm.chooseFile')}</div>
                           </div>
                         </label>
                         <button
                           onClick={() => startCamera(value)}
-                          className="border-2 border-dashed border-beige-300 rounded-xl p-6 text-center hover:border-gold-400 transition-colors bg-white hover:bg-beige-50"
+                          className="border-2 border-dashed border-beige-300 rounded-lg sm:rounded-xl p-4 sm:p-6 text-center hover:border-gold-400 transition-colors bg-white hover:bg-beige-50"
                         >
-                          <div className="flex justify-center mb-2">
-                            <svg className="w-8 h-8 text-gold-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <div className="flex justify-center mb-1.5 sm:mb-2">
+                            <svg className="w-6 h-6 sm:w-8 sm:h-8 text-gold-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
                           </div>
-                          <div className="text-text-primary font-semibold text-sm mb-1">{t('palm.camera')}</div>
-                          <div className="text-text-tertiary text-xs">{t('palm.takePhoto')}</div>
+                          <div className="text-text-primary font-semibold text-xs sm:text-sm mb-1">{t('palm.camera')}</div>
+                          <div className="text-text-tertiary text-[10px] sm:text-xs">{t('palm.takePhoto')}</div>
                         </button>
                       </div>
                       <label className="block">

@@ -152,19 +152,21 @@ export default function SettingsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gold-50 via-ivory-100 to-gold-50 p-4 md:p-6">
-      <div className="max-w-4xl mx-auto py-6">
+    <main className="min-h-screen bg-gradient-to-br from-gold-50 via-ivory-100 to-gold-50 p-3 sm:p-4 md:p-6">
+      <div className="max-w-4xl mx-auto py-4 sm:py-6 px-2 sm:px-4">
         {/* Header */}
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h1 className="text-4xl font-bold text-text-primary mb-2 ">{t('settings.title')}</h1>
-            <p className="text-text-secondary">{t('settings.manageProfile')}</p>
+        <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-primary mb-1 sm:mb-2">{t('settings.title')}</h1>
+            <p className="text-text-secondary text-sm sm:text-base">{t('settings.manageProfile')}</p>
           </div>
-          <div className="flex items-center gap-3">
-            <LanguageSwitcher />
+          <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+            <div className="hidden sm:block">
+              <LanguageSwitcher />
+            </div>
             <Link
               href="/dashboard"
-              className="px-5 py-2.5 bg-white border-2 border-beige-300 hover:border-gold-400 text-text-primary rounded-xl font-semibold transition-all shadow-soft hover:shadow-soft-lg flex items-center gap-2"
+              className="px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 bg-white border-2 border-beige-300 hover:border-gold-400 text-text-primary rounded-lg sm:rounded-xl font-semibold transition-all shadow-soft hover:shadow-soft-lg flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -176,8 +178,8 @@ export default function SettingsPage() {
 
         <div className="space-y-6">
           {/* Basic Information */}
-          <div className="bg-gradient-to-br from-gold-50/90 via-ivory-100/90 to-gold-50/90 backdrop-blur-lg rounded-3xl p-6 md:p-8 border border-gold-200/50 shadow-soft-xl">
-            <h2 className="text-2xl font-bold text-text-primary mb-6 ">{t('settings.basicInformation')}</h2>
+          <div className="bg-gradient-to-br from-gold-50/90 via-ivory-100/90 to-gold-50/90 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-gold-200/50 shadow-soft-xl">
+            <h2 className="text-xl sm:text-2xl font-bold text-text-primary mb-4 sm:mb-6">{t('settings.basicInformation')}</h2>
             <div className="space-y-5">
               <div>
                 <label className="block text-text-primary font-medium mb-2 text-sm">{t('auth.fullName')}</label>
@@ -226,10 +228,10 @@ export default function SettingsPage() {
           </div>
 
           {/* Birth Details */}
-          <div className="bg-gradient-to-br from-gold-50/90 via-ivory-100/90 to-gold-50/90 backdrop-blur-lg rounded-3xl p-6 md:p-8 border border-gold-200/50 shadow-soft-xl">
-            <h2 className="text-2xl font-bold text-text-primary mb-6 ">{t('settings.birthDetails')}</h2>
+          <div className="bg-gradient-to-br from-gold-50/90 via-ivory-100/90 to-gold-50/90 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-gold-200/50 shadow-soft-xl">
+            <h2 className="text-xl sm:text-2xl font-bold text-text-primary mb-4 sm:mb-6">{t('settings.birthDetails')}</h2>
             <div className="space-y-5">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className="block text-text-primary font-medium mb-2 text-sm">{t('onboarding.dateOfBirth')}</label>
                   <DatePicker
@@ -260,7 +262,7 @@ export default function SettingsPage() {
           </div>
 
           {/* Palm Images */}
-          <div className="bg-gradient-to-br from-gold-50/90 via-ivory-100/90 to-gold-50/90 backdrop-blur-lg rounded-3xl p-6 md:p-8 border border-gold-200/50 shadow-soft-xl">
+          <div className="bg-gradient-to-br from-gold-50/90 via-ivory-100/90 to-gold-50/90 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-gold-200/50 shadow-soft-xl">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-text-primary ">{t('settings.palmImages')}</h2>
               <Link
@@ -277,7 +279,7 @@ export default function SettingsPage() {
             {palmImages.length === 0 ? (
               <p className="text-text-secondary">{t('settings.noPalmImages')}</p>
             ) : (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
                 {palmImages.map((image) => (
                   <div key={image.id} className="relative group">
                     {image.signed_url ? (

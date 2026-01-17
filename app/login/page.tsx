@@ -47,12 +47,12 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-soft flex items-center justify-center p-4 relative">
-      <div className="fixed top-4 right-4 z-50">
+    <main className="min-h-screen bg-gradient-soft flex items-center justify-center p-3 sm:p-4 relative">
+      <div className="fixed top-3 right-3 sm:top-4 sm:right-4 z-50">
         <LanguageSwitcher />
       </div>
       <div className="w-full max-w-md animate-scale-in">
-        <div className="bg-white/80 backdrop-blur-lg rounded-3xl p-8 md:p-10 shadow-soft-xl border border-beige-300/50">
+        <div className="bg-white/80 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 shadow-soft-xl border border-beige-300/50">
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-gold-400 to-gold-600 rounded-2xl mb-4 shadow-soft">
               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">

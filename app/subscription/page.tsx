@@ -333,28 +333,28 @@ export default function SubscriptionPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gold-50 via-ivory-100 to-gold-50 p-4 md:p-6 relative">
-      <div className="fixed top-4 right-4 z-50">
+    <main className="min-h-screen bg-gradient-to-br from-gold-50 via-ivory-100 to-gold-50 p-3 sm:p-4 md:p-6 relative">
+      <div className="fixed top-3 right-3 sm:top-4 sm:right-4 z-50">
         <LanguageSwitcher />
       </div>
-      <div className="max-w-7xl mx-auto py-6">
+      <div className="max-w-7xl mx-auto py-4 sm:py-6 px-3 sm:px-4 md:px-6">
         {/* Header */}
-        <div className={`text-center mb-12 transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
+        <div className={`text-center mb-8 sm:mb-12 transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-2 text-text-secondary hover:text-text-primary mb-6 transition-colors"
+            className="inline-flex items-center gap-2 text-text-secondary hover:text-text-primary mb-4 sm:mb-6 transition-colors text-sm sm:text-base"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
             {t('subscription.backToDashboard')}
           </Link>
-          <h1 className="text-5xl md:text-6xl font-bold text-text-primary font-serif mb-4">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-text-primary font-serif mb-3 sm:mb-4">
             {t('subscription.title')}
           </h1>
           {currentPlan && (
-            <div className="mb-4 inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-gold-100 to-gold-200 rounded-full border-2 border-gold-400">
-              <svg className="w-5 h-5 text-gold-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="mb-4 inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-gold-100 to-gold-200 rounded-full border-2 border-gold-400 text-xs sm:text-sm">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gold-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <span className="text-gold-800 font-semibold">
@@ -362,15 +362,15 @@ export default function SubscriptionPage() {
               </span>
             </div>
           )}
-          <p className="text-xl text-text-secondary max-w-2xl mx-auto mb-8">
+          <p className="text-base sm:text-lg md:text-xl text-text-secondary max-w-2xl mx-auto mb-6 sm:mb-8 px-2">
             {t('subscription.description')}
           </p>
 
           {/* Billing Toggle */}
-          <div className="inline-flex items-center gap-4 bg-white/80 backdrop-blur-sm rounded-full p-2 border-2 border-beige-300 shadow-soft">
+          <div className="inline-flex items-center gap-2 sm:gap-4 bg-white/80 backdrop-blur-sm rounded-full p-1.5 sm:p-2 border-2 border-beige-300 shadow-soft">
             <button
               onClick={() => setBillingCycle('monthly')}
-              className={`px-6 py-2 rounded-full font-semibold transition-all ${
+              className={`px-4 sm:px-6 py-1.5 sm:py-2 rounded-full font-semibold transition-all text-xs sm:text-sm md:text-base ${
                 billingCycle === 'monthly'
                   ? 'bg-gradient-to-r from-gold-500 to-gold-600 text-white shadow-soft'
                   : 'text-text-secondary hover:text-text-primary'
@@ -380,14 +380,14 @@ export default function SubscriptionPage() {
             </button>
             <button
               onClick={() => setBillingCycle('yearly')}
-              className={`px-6 py-2 rounded-full font-semibold transition-all relative ${
+              className={`px-4 sm:px-6 py-1.5 sm:py-2 rounded-full font-semibold transition-all relative text-xs sm:text-sm md:text-base ${
                 billingCycle === 'yearly'
                   ? 'bg-gradient-to-r from-gold-500 to-gold-600 text-white shadow-soft'
                   : 'text-text-secondary hover:text-text-primary'
               }`}
             >
               {t('subscription.yearly')}
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+              <span className="absolute -top-1.5 -right-1.5 sm:-top-2 sm:-right-2 bg-red-500 text-white text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap">
                 {t('subscription.savePercent')} 20%
               </span>
             </button>
@@ -395,7 +395,7 @@ export default function SubscriptionPage() {
         </div>
 
         {/* Plans Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-12">
           {plans.map((plan, index) => {
             const colors = colorClasses[plan.color]
             const price = billingCycle === 'monthly' ? plan.priceMonthly : plan.priceYearly
@@ -404,16 +404,16 @@ export default function SubscriptionPage() {
             return (
               <div
                 key={plan.id}
-                className={`group relative bg-gradient-to-br ${colors.bg} ${colors.hover} rounded-3xl p-8 border-2 ${colors.border} transition-all duration-700 shadow-soft-xl hover:shadow-2xl hover:-translate-y-4 hover:scale-[1.05] overflow-hidden ${
+                className={`group relative bg-gradient-to-br ${colors.bg} ${colors.hover} rounded-2xl sm:rounded-3xl p-6 sm:p-8 border-2 ${colors.border} transition-all duration-700 shadow-soft-xl hover:shadow-2xl hover:-translate-y-4 hover:scale-[1.05] overflow-hidden ${
                   mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                } ${plan.popular ? 'ring-4 ring-gold-400 ring-opacity-50 scale-105 z-10' : ''}`}
+                } ${plan.popular ? 'ring-2 sm:ring-4 ring-gold-400 ring-opacity-50 scale-105 z-10' : ''}`}
                 style={{ transitionDelay: `${200 + index * 100}ms` }}
                 onMouseEnter={() => setHoveredPlan(plan.id)}
                 onMouseLeave={() => setHoveredPlan(null)}
               >
                 {/* Popular Badge */}
                 {plan.popular && (
-                  <div className="absolute top-0 right-0 bg-gradient-to-r from-gold-500 to-gold-600 text-white px-4 py-1 rounded-bl-2xl rounded-tr-3xl text-sm font-bold shadow-soft z-20">
+                  <div className="absolute top-0 right-0 bg-gradient-to-r from-gold-500 to-gold-600 text-white px-3 sm:px-4 py-0.5 sm:py-1 rounded-bl-xl sm:rounded-bl-2xl rounded-tr-2xl sm:rounded-tr-3xl text-xs sm:text-sm font-bold shadow-soft z-20">
                     {t('subscription.mostPopular')}
                   </div>
                 )}
@@ -429,53 +429,53 @@ export default function SubscriptionPage() {
                 {/* Content */}
                 <div className="relative z-10">
                   {/* Icon */}
-                  <div className={`mb-6 p-4 bg-white/80 rounded-2xl inline-flex ${colors.icon} group-hover:scale-125 group-hover:rotate-12 transition-all duration-500 shadow-soft`}>
-                    {plan.icon}
+                  <div className={`mb-4 sm:mb-6 p-3 sm:p-4 bg-white/80 rounded-xl sm:rounded-2xl inline-flex ${colors.icon} group-hover:scale-125 group-hover:rotate-12 transition-all duration-500 shadow-soft`}>
+                    <div className="w-6 h-6 sm:w-8 sm:h-8">{plan.icon}</div>
                   </div>
 
                   {/* Plan Name */}
-                  <h3 className="text-3xl font-bold text-text-primary mb-2 font-serif">{plan.name}</h3>
-                  <p className="text-text-secondary text-sm mb-6 min-h-[40px]">{plan.description}</p>
+                  <h3 className="text-2xl sm:text-3xl font-bold text-text-primary mb-2 font-serif">{plan.name}</h3>
+                  <p className="text-text-secondary text-xs sm:text-sm mb-4 sm:mb-6 min-h-[40px]">{plan.description}</p>
 
                   {/* Price */}
-                  <div className="mb-6">
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-4xl font-bold text-text-primary">
+                  <div className="mb-4 sm:mb-6">
+                    <div className="flex items-baseline gap-1 sm:gap-2">
+                      <span className="text-3xl sm:text-4xl font-bold text-text-primary">
                         ${price}
                       </span>
-                      <span className="text-text-secondary">
+                      <span className="text-text-secondary text-sm sm:text-base">
                         /{billingCycle === 'monthly' ? 'month' : 'year'}
                       </span>
                     </div>
                     {billingCycle === 'yearly' && plan.priceYearly > 0 && (
-                      <p className="text-sm text-text-tertiary mt-1">
+                      <p className="text-xs sm:text-sm text-text-tertiary mt-1">
                         ${plan.priceMonthly} {t('subscription.perMonth')} {t('subscription.billedAnnually')}
                       </p>
                     )}
                   </div>
 
                   {/* Questions per day */}
-                  <div className="mb-6 p-4 bg-white/60 rounded-xl border border-beige-200">
-                    <div className="text-sm text-text-secondary mb-1">{t('subscription.questionsPerDay')}</div>
-                    <div className="text-2xl font-bold text-text-primary">
+                  <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-white/60 rounded-lg sm:rounded-xl border border-beige-200">
+                    <div className="text-xs sm:text-sm text-text-secondary mb-1">{t('subscription.questionsPerDay')}</div>
+                    <div className="text-xl sm:text-2xl font-bold text-text-primary">
                       {plan.questionsPerDay}
                     </div>
                   </div>
 
                   {/* Delivery time */}
-                  <div className="mb-6 p-4 bg-white/60 rounded-xl border border-beige-200">
-                    <div className="text-sm text-text-secondary mb-1">{t('subscription.deliveryTime')}</div>
-                    <div className="text-lg font-semibold text-text-primary">
+                  <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-white/60 rounded-lg sm:rounded-xl border border-beige-200">
+                    <div className="text-xs sm:text-sm text-text-secondary mb-1">{t('subscription.deliveryTime')}</div>
+                    <div className="text-base sm:text-lg font-semibold text-text-primary">
                       {plan.deliveryTime}
                     </div>
                   </div>
 
                   {/* Features */}
-                  <ul className="space-y-3 mb-8">
+                  <ul className="space-y-2 sm:space-y-3 mb-6 sm:mb-8">
                     {plan.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-start gap-3">
+                      <li key={idx} className="flex items-start gap-2 sm:gap-3">
                         <svg
-                          className={`w-5 h-5 ${colors.icon} flex-shrink-0 mt-0.5`}
+                          className={`w-4 h-4 sm:w-5 sm:h-5 ${colors.icon} flex-shrink-0 mt-0.5`}
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -487,14 +487,14 @@ export default function SubscriptionPage() {
                             d="M5 13l4 4L19 7"
                           />
                         </svg>
-                        <span className="text-text-secondary text-sm">{feature}</span>
+                        <span className="text-text-secondary text-xs sm:text-sm">{feature}</span>
                       </li>
                     ))}
                   </ul>
 
                   {/* Current Plan Badge */}
                   {currentPlan === plan.id && (
-                    <div className="mb-4 p-3 bg-gradient-to-r from-gold-500 to-gold-600 text-white rounded-xl text-center font-semibold shadow-soft">
+                    <div className="mb-3 sm:mb-4 p-2 sm:p-3 bg-gradient-to-r from-gold-500 to-gold-600 text-white rounded-lg sm:rounded-xl text-center font-semibold shadow-soft text-xs sm:text-sm">
                       ✓ {t('subscription.currentPlan')}
                     </div>
                   )}
@@ -503,7 +503,7 @@ export default function SubscriptionPage() {
                   <button
                     onClick={() => handleSubscribe(plan.id)}
                     disabled={loading || currentPlan === plan.id}
-                    className={`w-full py-4 bg-gradient-to-r ${colors.button} text-white rounded-xl font-bold text-lg transition-all shadow-soft hover:shadow-soft-lg transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 ${
+                    className={`w-full py-3 sm:py-4 bg-gradient-to-r ${colors.button} text-white rounded-lg sm:rounded-xl font-bold text-sm sm:text-base md:text-lg transition-all shadow-soft hover:shadow-soft-lg transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 ${
                       currentPlan === plan.id ? 'opacity-60' : ''
                     }`}
                   >

@@ -28,15 +28,15 @@ export default function ChatPage() {
     <main className="h-screen flex flex-col bg-gradient-soft">
       {/* Header */}
       <div className="bg-white/80 backdrop-blur-lg border-b border-beige-300/50 shadow-soft">
-        <div className="max-w-6xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+        <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 py-3 sm:py-4">
+          <div className="flex items-center justify-between gap-2 sm:gap-4">
+            <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
               <Link
                 href="/dashboard"
-                className="p-2 text-text-tertiary hover:text-text-primary hover:bg-beige-50 rounded-lg transition-all"
+                className="p-1.5 sm:p-2 text-text-tertiary hover:text-text-primary hover:bg-beige-50 rounded-lg transition-all flex-shrink-0"
               >
                 <svg
-                  className="w-6 h-6"
+                  className="w-5 h-5 sm:w-6 sm:h-6"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -49,10 +49,10 @@ export default function ChatPage() {
                   />
                 </svg>
               </Link>
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-gradient-to-br from-gold-400 to-gold-600 rounded-xl shadow-soft">
+              <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                <div className="p-1.5 sm:p-2 bg-gradient-to-br from-gold-400 to-gold-600 rounded-lg sm:rounded-xl shadow-soft flex-shrink-0">
                   <svg
-                    className="w-6 h-6 text-white"
+                    className="w-5 h-5 sm:w-6 sm:h-6 text-white"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -65,20 +65,20 @@ export default function ChatPage() {
                     />
                   </svg>
                 </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-text-primary font-serif">{t('chat.askYourQuestion')}</h1>
-                  <p className="text-sm text-text-secondary">{t('chat.submitQuestionDesc')}</p>
+                <div className="min-w-0 flex-1">
+                  <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-text-primary font-serif truncate">{t('chat.askYourQuestion')}</h1>
+                  <p className="text-xs sm:text-sm text-text-secondary hidden sm:block">{t('chat.submitQuestionDesc')}</p>
                 </div>
               </div>
             </div>
             <Link
               href="/dashboard"
-              className="px-5 py-2.5 bg-white border-2 border-beige-300 hover:border-gold-400 text-text-primary rounded-xl transition-all font-semibold shadow-soft hover:shadow-soft-lg flex items-center gap-2"
+              className="px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 bg-white border-2 border-beige-300 hover:border-gold-400 text-text-primary rounded-lg sm:rounded-xl transition-all font-semibold shadow-soft hover:shadow-soft-lg flex items-center gap-1.5 sm:gap-2 flex-shrink-0 text-xs sm:text-sm md:text-base"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
               </svg>
-              {t('chat.dashboard')}
+              <span className="hidden sm:inline">{t('chat.dashboard')}</span>
             </Link>
           </div>
         </div>
