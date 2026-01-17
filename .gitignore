@@ -41,5 +41,9 @@ next-env.d.ts
 *.swp
 *.swo
 
+# Large model files
+tools/piper/voices/*.onnx
+*.onnx
+
 # OS
 Thumbs.db
