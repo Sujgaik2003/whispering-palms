@@ -4,5 +4,6 @@
       "path": "/api/email/cron",
       "schedule": "0 0 * * *"
     }
-  ]
+  ],
+  "buildCommand": "npm run build"
 }

@@ -20,6 +20,9 @@ const nextConfig = {
   poweredByHeader: false,
   compress: false,
   productionBrowserSourceMaps: false,
+  // Use webpack explicitly for compatibility
+  // Turbopack config (empty to use webpack instead)
+  turbopack: undefined,
   // Disable webpack cache to reduce memory usage
   webpack: (config, { isServer }) => {
     if (!isServer) {
