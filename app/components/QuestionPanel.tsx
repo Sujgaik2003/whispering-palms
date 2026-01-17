@@ -355,31 +355,30 @@ export default function QuestionPanel() {
 
       {/* Input Container */}
       <div className="border-t border-beige-300/50 bg-white/60 backdrop-blur-lg sticky bottom-0 z-10">
-        <div className="max-w-4xl mx-auto p-3 sm:p-4">
-          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-            <div className="flex-1 relative">
+        <div className="max-w-4xl mx-auto p-3 sm:p-4 md:p-5">
+          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-end sm:items-start">
+            <div className="flex-1 relative w-full">
               <textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={t('chat.typeYourQuestion')}
-                className="w-full bg-white border border-beige-300 rounded-lg sm:rounded-xl px-4 sm:px-5 py-3 sm:py-4 text-text-primary placeholder-text-light focus:outline-none focus:ring-2 focus:ring-gold-400 focus:border-gold-400 transition-all text-base sm:text-lg shadow-soft resize-none min-h-[100px] sm:min-h-[120px]"
+                className="w-full bg-white border border-beige-300 rounded-lg sm:rounded-xl px-4 sm:px-5 py-3 sm:py-4 text-text-primary placeholder-text-light focus:outline-none focus:ring-2 focus:ring-gold-400 focus:border-gold-400 transition-all text-sm sm:text-base md:text-lg shadow-soft resize-none min-h-[80px] sm:min-h-[100px] md:min-h-[120px] pr-16 sm:pr-20"
                 disabled={submitting || (quota && quota.max !== -1 && quota.remaining === 0)}
                 maxLength={1000}
-                rows={4}
+                rows={3}
               />
-              <div className="absolute bottom-2 sm:bottom-3 right-3 sm:right-4 text-xs sm:text-sm text-text-tertiary bg-white/80 px-1.5 py-0.5 rounded">
+              <div className="absolute bottom-2 sm:bottom-3 right-3 sm:right-4 text-[10px] sm:text-xs md:text-sm text-text-tertiary bg-white/90 px-1.5 py-0.5 rounded font-medium">
                 {input.length}/1000
               </div>
             </div>
-            <div className="flex flex-col gap-2 sm:gap-3">
-              <button
-                type="submit"
-                disabled={!input.trim() || submitting || (quota?.remaining === 0)}
-                className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white rounded-lg sm:rounded-xl font-semibold transition-all shadow-soft hover:shadow-soft-lg transform hover:scale-[1.02] flex items-center justify-center gap-2 text-sm sm:text-base whitespace-nowrap"
-              >
+            <button
+              type="submit"
+              disabled={!input.trim() || submitting || (quota?.remaining === 0)}
+              className="w-full sm:w-auto px-5 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white rounded-lg sm:rounded-xl font-semibold transition-all shadow-soft hover:shadow-soft-lg transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 text-sm sm:text-base whitespace-nowrap min-w-[120px] sm:min-w-[140px]"
+            >
               {submitting ? (
                 <>
-                  <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path
                       className="opacity-75"
@@ -387,11 +386,12 @@ export default function QuestionPanel() {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     />
                   </svg>
-                  <span>{t('common.loading')}</span>
+                  <span className="hidden sm:inline">{t('common.loading')}</span>
+                  <span className="sm:hidden">Loading...</span>
                 </>
               ) : (
                 <>
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -404,7 +404,7 @@ export default function QuestionPanel() {
               )}
             </button>
           </form>
-          <p className="text-text-tertiary text-xs sm:text-sm mt-2 text-center px-2">
+          <p className="text-text-tertiary text-[10px] sm:text-xs md:text-sm mt-2 sm:mt-3 text-center px-2">
             {t('chat.answerDeliveryNote')}
           </p>
         </div>
