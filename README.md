@@ -198,7 +198,29 @@ Visit `http://localhost:3000`
 
 ### Cron Job Configuration
 
-The project includes a cron job for email delivery (`vercel.json`):
+### Email Cron Job Setup
+
+**Important**: Vercel Hobby plan only allows cron jobs to run once per day. For 5-minute email delivery, you need to use an external cron service.
+
+#### Option 1: External Cron Service (Recommended for Hobby Plan)
+
+Use a free external cron service to hit your email endpoint every minute:
+
+1. **Sign up for cron-job.org** (free): https://cron-job.org
+2. **Create a new cron job**:
+   - **URL**: `https://your-app.vercel.app/api/email/cron`
+   - **Schedule**: Every minute (`*/1 * * * *`)
+   - **Request Method**: GET
+   - **Status**: Active
+3. **Save the cron job**
+
+**Alternative Services**:
+- **EasyCron**: https://www.easycron.com (free tier available)
+- **UptimeRobot**: https://uptimerobot.com (free tier: 5-minute intervals)
+
+#### Option 2: Vercel Pro Plan
+
+If you upgrade to Vercel Pro ($20/month), you can use the built-in cron job:
 
 ```json
 {
@@ -211,7 +233,19 @@ The project includes a cron job for email delivery (`vercel.json`):
 }
 ```
 
-**Note**: Cron jobs require Vercel Pro plan. For Hobby plan, use external cron service (e.g., cron-job.org) to hit `/api/email/cron` every minute.
+**Current `vercel.json`** (set to daily for Hobby plan compatibility):
+```json
+{
+  "crons": [
+    {
+      "path": "/api/email/cron",
+      "schedule": "0 0 * * *"
+    }
+  ]
+}
+```
+
+**Note**: The daily cron in `vercel.json` is a fallback. For proper email delivery, use an external cron service (Option 1) or upgrade to Pro (Option 2).
 
 ### Webhook Configuration
 
