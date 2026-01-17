@@ -47,3 +47,20 @@ tools/piper/voices/*.onnx
 
 # OS
 Thumbs.db
+
+# Large model files and storage
+tools/piper/voices/*.onnx
+*.onnx
+anythingllm/qdrant_storage/
+anythingllm/storage/
+*.dat
+*.info
+
+# Documentation (keep only README.md)
+*.md
+!README.md
+
+# Build artifacts
+.next/
+tsc_output.txt
+*.tsbuildinfo
