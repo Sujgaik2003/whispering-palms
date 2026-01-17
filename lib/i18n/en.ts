@@ -218,6 +218,8 @@ export default {
   'palm.allLinesVisible': 'All lines visible',
   'palm.uploadTip': 'Tip: Place your hand on a flat surface with good lighting. Keep your palm open with fingers naturally spread apart. Make sure all major lines (life line, heart line, head line) are clearly visible in the photo.',
   'palm.uploadTips': 'Upload Tips for Best Results',
+  'palm.uploadTipsTitle': 'Upload Tips for Best Results',
+  'palm.tipContent': 'Place your hand on a flat surface with good lighting. Keep your palm open with fingers naturally spread apart. Make sure all major lines (life line, heart line, head line) are clearly visible in the photo.',
   'palm.goodLighting': 'Good Lighting',
   'palm.goodLightingDesc': 'Use natural or bright light for clear photos',
   'palm.flatPalm': 'Flat Palm',
@@ -244,6 +246,9 @@ export default {
   'chat.askYourQuestion': 'Ask Your Question',
   'chat.submitQuestionDesc': 'Submit your question and receive a personalized answer via email',
   'chat.dashboard': 'Dashboard',
+  'chat.typeYourQuestion': 'Type your question here...',
+  'chat.answerDeliveryNote': 'Your answer will be delivered via email based on your subscription plan.',
+  'chat.submit': 'Submit',
   
   // Subscription Plans
   'plan.basic': 'Basic',

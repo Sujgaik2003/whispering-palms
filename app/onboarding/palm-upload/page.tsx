@@ -136,14 +136,25 @@ export default function PalmUploadPage() {
         body: formData,
       })
 
-      const result = await response.json()
+      let result
+      const contentType = response.headers.get('content-type')
+      if (contentType && contentType.includes('application/json')) {
+        result = await response.json()
+      } else {
+        const text = await response.text()
+        try {
+          result = JSON.parse(text)
+        } catch {
+          throw new Error(text || t('palm.uploadFailed'))
+        }
+      }
 
       if (!response.ok) {
         if (response.status === 401) {
           router.push('/login')
           return
         }
-        throw new Error(result.error?.message || t('palm.uploadFailed'))
+        throw new Error(result.error?.message || result.message || t('palm.uploadFailed'))
       }
 
       setUploadedImages(prev => {
@@ -462,27 +473,28 @@ export default function PalmUploadPage() {
   }, [])
 
   return (
-    <main className="min-h-screen bg-gradient-soft p-4 flex items-center justify-center py-12 relative">
-      <div className="fixed top-4 right-4 z-50">
+    <main className="min-h-screen bg-gradient-soft p-3 sm:p-4 py-6 sm:py-8 relative">
+      <div className="fixed top-3 right-3 sm:top-4 sm:right-4 z-50">
         <LanguageSwitcher />
       </div>
-      <div className="max-w-4xl mx-auto w-full animate-scale-in">
-        <div className="bg-white/80 backdrop-blur-lg rounded-3xl p-8 md:p-10 shadow-soft-xl border border-beige-300/50">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-2">
+      <div className="max-w-4xl mx-auto w-full animate-scale-in px-2 sm:px-4">
+        <div className="bg-white/80 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-soft-xl border border-beige-300/50">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 sm:gap-3 mb-2">
                 <Link
                   href="/dashboard"
-                  className="p-2 hover:bg-beige-50 rounded-lg transition-colors"
+                  className="p-1.5 sm:p-2 hover:bg-beige-50 rounded-lg transition-colors flex-shrink-0"
                   title={t('settings.backToDashboard')}
                 >
-                  <svg className="w-6 h-6 text-text-tertiary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-text-tertiary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                   </svg>
                 </Link>
-                <div>
-                  <h1 className="text-3xl font-bold text-text-primary font-serif">{t('palm.uploadTitle')}</h1>
-                  <p className="text-text-secondary mt-1">
+                <div className="min-w-0 flex-1">
+                  <h1 className="text-2xl sm:text-3xl font-bold text-text-primary font-serif">{t('palm.uploadTitle')}</h1>
+                  <p className="text-text-secondary mt-1 text-sm sm:text-base">
                     {t('palm.uploadDesc')}
                   </p>
                 </div>
@@ -490,7 +502,121 @@ export default function PalmUploadPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          {/* Instructions Section - MOVED TO TOP */}
+          {/* Reference Palm Image */}
+          <div className="bg-gradient-to-br from-sage-50 to-gold-50 border border-sage-200/50 rounded-xl p-4 sm:p-6 mb-4 sm:mb-6">
+            <div className="flex items-start gap-3 sm:gap-4 mb-3 sm:mb-4">
+              <div className="p-2 sm:p-3 bg-gradient-to-br from-sage-400 to-sage-600 rounded-lg sm:rounded-xl shadow-soft flex-shrink-0">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-text-primary font-bold text-base sm:text-lg mb-2 sm:mb-3 font-serif">{t('palm.howToPosition')}</h4>
+                <p className="text-text-secondary text-xs sm:text-sm mb-3 sm:mb-4">
+                  {t('palm.positionGuide')}
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  <div className="bg-white/80 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-beige-200">
+                    <p className="text-text-primary font-semibold text-xs sm:text-sm mb-2 text-center">{t('palm.rightPalmReference')}</p>
+                    <div className="bg-gradient-to-br from-beige-100 to-beige-200 rounded-lg p-4 sm:p-6 flex items-center justify-center min-h-[150px] sm:min-h-[200px] border-2 border-dashed border-beige-300">
+                      <div className="text-center">
+                        <svg className="w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-2 sm:mb-3 text-sage-600 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11" />
+                        </svg>
+                        <p className="text-text-tertiary text-[10px] sm:text-xs">{t('palm.palmFlat')}</p>
+                        <p className="text-text-tertiary text-[10px] sm:text-xs mt-1">{t('palm.allLinesVisible')}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-white/80 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-beige-200">
+                    <p className="text-text-primary font-semibold text-xs sm:text-sm mb-2 text-center">{t('palm.leftPalmReference')}</p>
+                    <div className="bg-gradient-to-br from-beige-100 to-beige-200 rounded-lg p-4 sm:p-6 flex items-center justify-center min-h-[150px] sm:min-h-[200px] border-2 border-dashed border-beige-300">
+                      <div className="text-center">
+                        <svg className="w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-2 sm:mb-3 text-sage-600 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ transform: 'scaleX(-1)' }}>
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11" />
+                        </svg>
+                        <p className="text-text-tertiary text-[10px] sm:text-xs">{t('palm.palmFlat')}</p>
+                        <p className="text-text-tertiary text-[10px] sm:text-xs mt-1">{t('palm.allLinesVisible')}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-3 sm:mt-4 p-2 sm:p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-blue-800 text-[10px] sm:text-xs flex items-start gap-2">
+                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>{t('palm.tipContent')}</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Upload Tips */}
+          <div className="bg-gradient-to-br from-gold-50 to-peach-50 border border-gold-200/50 rounded-xl p-4 sm:p-6 mb-4 sm:mb-6">
+            <div className="flex items-start gap-3 sm:gap-4 mb-3 sm:mb-4">
+              <div className="p-2 sm:p-3 bg-gradient-to-br from-gold-400 to-gold-600 rounded-lg sm:rounded-xl shadow-soft flex-shrink-0">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-text-primary font-bold text-base sm:text-lg mb-3 sm:mb-4 font-serif">{t('palm.uploadTipsTitle')}</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  <div className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 bg-white/60 rounded-lg sm:rounded-xl border border-beige-200">
+                    <div className="p-1.5 sm:p-2 bg-gold-100 rounded-lg flex-shrink-0">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gold-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                      </svg>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-text-primary font-semibold text-xs sm:text-sm mb-1">{t('palm.goodLighting')}</p>
+                      <p className="text-text-secondary text-[10px] sm:text-xs">{t('palm.goodLightingDesc')}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 bg-white/60 rounded-lg sm:rounded-xl border border-beige-200">
+                    <div className="p-1.5 sm:p-2 bg-sage-100 rounded-lg flex-shrink-0">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5 text-sage-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11" />
+                      </svg>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-text-primary font-semibold text-xs sm:text-sm mb-1">{t('palm.flatPalm')}</p>
+                      <p className="text-text-secondary text-[10px] sm:text-xs">{t('palm.flatPalmDesc')}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 bg-white/60 rounded-lg sm:rounded-xl border border-beige-200">
+                    <div className="p-1.5 sm:p-2 bg-peach-100 rounded-lg flex-shrink-0">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5 text-peach-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-text-primary font-semibold text-xs sm:text-sm mb-1">{t('palm.clearLines')}</p>
+                      <p className="text-text-secondary text-[10px] sm:text-xs">{t('palm.clearLinesDesc')}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 bg-white/60 rounded-lg sm:rounded-xl border border-beige-200">
+                    <div className="p-1.5 sm:p-2 bg-gold-100 rounded-lg flex-shrink-0">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gold-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-text-primary font-semibold text-xs sm:text-sm mb-1">{t('palm.steadyCamera')}</p>
+                      <p className="text-text-secondary text-[10px] sm:text-xs">{t('palm.steadyCameraDesc')}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Upload Section - MOVED TO BOTTOM */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
             {PALM_TYPES.map(({ value, label, description }) => {
               const image = getImageForType(value)
 
@@ -740,123 +866,12 @@ export default function PalmUploadPage() {
               </div>
             )}
 
-          {/* Reference Palm Image */}
-          <div className="bg-gradient-to-br from-sage-50 to-gold-50 border border-sage-200/50 rounded-xl p-6 mb-6">
-            <div className="flex items-start gap-4 mb-4">
-              <div className="p-3 bg-gradient-to-br from-sage-400 to-sage-600 rounded-xl shadow-soft">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <div className="flex-1">
-                <h4 className="text-text-primary font-bold text-lg mb-3 font-serif">{t('palm.howToPosition')}</h4>
-                <p className="text-text-secondary text-sm mb-4">
-                  {t('palm.positionGuide')}
-                </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="bg-white/80 rounded-xl p-4 border border-beige-200">
-                    <p className="text-text-primary font-semibold text-sm mb-2 text-center">{t('palm.rightPalmReference')}</p>
-                    <div className="bg-gradient-to-br from-beige-100 to-beige-200 rounded-lg p-6 flex items-center justify-center min-h-[200px] border-2 border-dashed border-beige-300">
-                      <div className="text-center">
-                        <svg className="w-24 h-24 mx-auto mb-3 text-sage-600 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11" />
-                        </svg>
-                        <p className="text-text-tertiary text-xs">{t('palm.palmFlat')}</p>
-                        <p className="text-text-tertiary text-xs mt-1">{t('palm.allLinesVisible')}</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="bg-white/80 rounded-xl p-4 border border-beige-200">
-                    <p className="text-text-primary font-semibold text-sm mb-2 text-center">{t('palm.leftPalmReference')}</p>
-                    <div className="bg-gradient-to-br from-beige-100 to-beige-200 rounded-lg p-6 flex items-center justify-center min-h-[200px] border-2 border-dashed border-beige-300">
-                      <div className="text-center">
-                        <svg className="w-24 h-24 mx-auto mb-3 text-sage-600 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ transform: 'scaleX(-1)' }}>
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11" />
-                        </svg>
-                        <p className="text-text-tertiary text-xs">{t('palm.palmFlat')}</p>
-                        <p className="text-text-tertiary text-xs mt-1">{t('palm.allLinesVisible')}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                  <p className="text-blue-800 text-xs flex items-start gap-2">
-                    <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>{t('palm.uploadTip')}</span>
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Upload Tips */}
-          <div className="bg-gradient-to-br from-gold-50 to-peach-50 border border-gold-200/50 rounded-xl p-6 mb-6">
-            <div className="flex items-start gap-4 mb-4">
-              <div className="p-3 bg-gradient-to-br from-gold-400 to-gold-600 rounded-xl shadow-soft">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                </svg>
-              </div>
-              <div className="flex-1">
-                <h4 className="text-text-primary font-bold text-lg mb-4 font-serif">{t('palm.uploadTips')}</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex items-start gap-3 p-3 bg-white/60 rounded-xl border border-beige-200">
-                    <div className="p-2 bg-gold-100 rounded-lg">
-                      <svg className="w-5 h-5 text-gold-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-text-primary font-semibold text-sm mb-1">{t('palm.goodLighting')}</p>
-                      <p className="text-text-secondary text-xs">{t('palm.goodLightingDesc')}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 p-3 bg-white/60 rounded-xl border border-beige-200">
-                    <div className="p-2 bg-sage-100 rounded-lg">
-                      <svg className="w-5 h-5 text-sage-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11" />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-text-primary font-semibold text-sm mb-1">{t('palm.flatPalm')}</p>
-                      <p className="text-text-secondary text-xs">{t('palm.flatPalmDesc')}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 p-3 bg-white/60 rounded-xl border border-beige-200">
-                    <div className="p-2 bg-peach-100 rounded-lg">
-                      <svg className="w-5 h-5 text-peach-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-text-primary font-semibold text-sm mb-1">{t('palm.clearLines')}</p>
-                      <p className="text-text-secondary text-xs">{t('palm.clearLinesDesc')}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 p-3 bg-white/60 rounded-xl border border-beige-200">
-                    <div className="p-2 bg-gold-100 rounded-lg">
-                      <svg className="w-5 h-5 text-gold-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-text-primary font-semibold text-sm mb-1">{t('palm.steadyCamera')}</p>
-                      <p className="text-text-secondary text-xs">{t('palm.steadyCameraDesc')}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-end">
+          {/* Continue Button */}
+          <div className="flex justify-center sm:justify-end mt-4 sm:mt-6">
             <button
               onClick={handleContinue}
               disabled={uploading || uploadedImages.some(img => img.uploading) || matchingInProgress}
-              className="px-8 py-3.5 bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-white rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 ease-out shadow-soft hover:shadow-soft-lg hover:shadow-gold-500/30 transform hover:scale-[1.03] active:scale-[0.98]"
+              className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-3.5 bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-white rounded-lg sm:rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 ease-out shadow-soft hover:shadow-soft-lg hover:shadow-gold-500/30 transform hover:scale-[1.03] active:scale-[0.98] text-sm sm:text-base"
             >
               {matchingInProgress ? t('palm.matchingInProgress') : t('palm.continue')}
             </button>
