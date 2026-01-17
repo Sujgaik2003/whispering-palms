@@ -1,0 +1,13 @@
+{
+    "id": "e0e5f625-92ae-400b-a405-3c51bfb85878",
+    "url": "file:///app/collector/hotdir/test-document.txt",
+    "title": "test-document.txt",
+    "docAuthor": "Unknown",
+    "description": "Unknown",
+    "docSource": "a text file uploaded by the user.",
+    "chunkSource": "",
+    "published": "1/9/2026, 12:28:45 PM",
+    "wordCount": 3,
+    "pageContent": "Test document content",
+    "token_count_estimate": 3
+}
