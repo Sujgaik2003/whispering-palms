@@ -8,7 +8,7 @@ import { createClient } from '@/lib/supabase/server'
 import Stripe from 'stripe'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2024-11-20.acacia',
+  apiVersion: '2025-02-24.acacia',
 })
 
 export async function POST(request: NextRequest) {
@@ -54,6 +54,10 @@ export async function POST(request: NextRequest) {
       case 'customer.subscription.created':
       case 'customer.subscription.updated':
         await handleSubscriptionUpdated(event.data.object as Stripe.Subscription, supabase)
+        break
+
+      case 'checkout.session.completed':
+        await handleCheckoutSessionCompleted(event.data.object as Stripe.Checkout.Session, supabase)
         break
 
       case 'customer.subscription.deleted':
@@ -144,6 +148,37 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription, supa
       subscription_plan: subscription.metadata.planType || 'basic',
     })
     .eq('user_id', userId)
+}
+
+async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session, supabase: any) {
+  const metadata = session.metadata || {}
+  const userId = metadata.userId || session.client_reference_id
+  const planType = metadata.planType || 'basic'
+
+  if (!userId) return
+
+  // Update user profile
+  await supabase
+    .from('user_profiles')
+    .update({
+      subscription_plan: planType,
+    })
+    .eq('user_id', userId)
+
+  // Track the transaction
+  await supabase.from('transactions').insert({
+    user_id: userId,
+    type: 'subscription',
+    amount: (session.amount_total || 0) / 100,
+    currency: (session.currency || 'USD').toUpperCase(),
+    provider: 'stripe',
+    provider_payment_id: session.id, // Storing session ID as reference
+    status: 'succeeded',
+    metadata: {
+      ...metadata,
+      event: 'checkout_session_completed'
+    },
+  })
 }
 
 async function handleSubscriptionDeleted(subscription: Stripe.Subscription, supabase: any) {

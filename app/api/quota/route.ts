@@ -9,6 +9,7 @@ import { quotaService } from '@/lib/services/quota'
  * Get current quota status for authenticated user
  */
 export async function GET(request: NextRequest) {
+  console.log('[API] Quota request received')
   try {
     const user = await getAuthenticatedUser()
     if (!user) {

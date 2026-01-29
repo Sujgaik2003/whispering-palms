@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Toast from '@/app/components/Toast'
@@ -19,7 +19,7 @@ interface Plan {
   deliveryTime: string
   color: 'basic' | 'spark' | 'flame' | 'superflame'
   popular?: boolean
-  icon: JSX.Element
+  icon: React.ReactNode
 }
 
 // Plans array - will be created as a function to use translations
@@ -251,6 +251,14 @@ export default function SubscriptionPage() {
   const fetchCurrentPlan = async () => {
     try {
       const response = await fetch('/api/quota')
+
+      const contentType = response.headers.get('content-type')
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text()
+        console.error('Expected JSON but received:', text.substring(0, 100))
+        return
+      }
+
       const result = await response.json()
       if (response.ok && result.data?.plan) {
         setCurrentPlan(result.data.plan)
@@ -333,22 +341,27 @@ export default function SubscriptionPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gold-50 via-ivory-100 to-gold-50 p-3 sm:p-4 md:p-6 relative">
-      <div className="fixed top-3 right-3 sm:top-4 sm:right-4 z-50">
-        <LanguageSwitcher />
-      </div>
-      <div className="max-w-7xl mx-auto py-4 sm:py-6 px-3 sm:px-4 md:px-6">
-        {/* Header */}
-        <div className={`text-center mb-8 sm:mb-12 transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
+    <main className="min-h-screen bg-gradient-to-br from-gold-50 via-ivory-100 to-gold-50 relative overflow-x-hidden">
+      <div className="max-w-7xl mx-auto py-6 sm:py-12 px-4 sm:px-6">
+        {/* Top Navbar Area */}
+        <div className="flex flex-row justify-between items-center mb-8 gap-4">
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-2 text-text-secondary hover:text-text-primary mb-4 sm:mb-6 transition-colors text-sm sm:text-base"
+            className="inline-flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors text-sm sm:text-base font-medium"
           >
-            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            {t('subscription.backToDashboard')}
+            <span className="hidden xs:inline">{t('subscription.backToDashboard')}</span>
+            <span className="xs:hidden">Back</span>
           </Link>
+          <div className="flex-shrink-0">
+            <LanguageSwitcher />
+          </div>
+        </div>
+
+        {/* Header */}
+        <div className={`text-center mb-10 sm:mb-16 transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-text-primary font-serif mb-3 sm:mb-4">
             {t('subscription.title')}
           </h1>
@@ -397,7 +410,7 @@ export default function SubscriptionPage() {
         </div>
 
         {/* Plans Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 md:gap-10 mb-12 sm:mb-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 sm:gap-8 mb-12 sm:mb-20 px-2 sm:px-0">
           {plans.map((plan, index) => {
             const colors = colorClasses[plan.color]
             const price = billingCycle === 'monthly' ? plan.priceMonthly : plan.priceYearly

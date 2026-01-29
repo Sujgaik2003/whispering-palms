@@ -39,18 +39,11 @@ export default function CheckoutModal({
     type: 'info',
     isVisible: false,
   })
-  
-  // Calculate INR amount for Razorpay (if currency is USD)
+
   const inrAmount = currency === 'USD' ? convertUSDToINR(amount) : amount
 
   useEffect(() => {
     if (isOpen) {
-      setStep('provider')
-      setPaymentIntent(null)
-      setSelectedProvider('stripe')
-      setLoading(false)
-    } else {
-      // Cleanup when modal closes
       setStep('provider')
       setPaymentIntent(null)
       setSelectedProvider('stripe')
@@ -68,16 +61,7 @@ export default function CheckoutModal({
     setLoading(true)
 
     try {
-      // Razorpay requires INR currency for UPI/Net Banking
-      // Convert USD amount to INR for Razorpay
-      let paymentAmount = amount
-      let paymentCurrency = currency
-      
-      if (provider === 'razorpay' && currency === 'USD') {
-        // Convert USD to INR for Razorpay
-        paymentAmount = inrAmount
-        paymentCurrency = 'INR'
-      }
+      console.log(`[Checkout] Initializing ${provider} payment for ${planType}...`)
 
       const response = await fetch('/api/payments/create-intent', {
         method: 'POST',
@@ -86,178 +70,77 @@ export default function CheckoutModal({
           planType,
           billingPeriod,
           provider,
-          amount: paymentAmount, // Use converted INR amount for Razorpay
-          currency: paymentCurrency, // Use INR for Razorpay
+          amount,
+          currency: 'USD',
         }),
       })
 
       const data = await response.json()
 
       if (!response.ok) {
-        // Extract clean error message without URLs
-        const errorMsg = data.error || 'Failed to create payment intent'
-        throw new Error(typeof errorMsg === 'string' ? errorMsg : 'Failed to initialize payment')
+        throw new Error(data.error || 'Failed to initialize payment')
       }
 
       setPaymentIntent(data.paymentIntent)
       setStep('payment')
-    } catch (error: any) {
-      // Clean error message - remove URLs and technical details
-      let errorMessage = 'Failed to initialize payment'
-      const errorStr = error?.message || error?.toString() || ''
-      if (errorStr && !errorStr.includes('http') && !errorStr.includes('fetch') && !errorStr.includes('axios') && !errorStr.includes('api/')) {
-        errorMessage = errorStr
+
+      if (provider === 'stripe') {
+        const stripe = (window as any).Stripe?.(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
+        if (stripe && data.paymentIntent.id) {
+          console.log(`[Checkout] Redirecting to Stripe Session: ${data.paymentIntent.id}`)
+          const { error } = await stripe.redirectToCheckout({
+            sessionId: data.paymentIntent.id
+          })
+          if (error) {
+            console.error('[Checkout] Stripe Redirect Error:', error)
+            showToast(error.message || 'Stripe redirect failed', 'error')
+            setLoading(false)
+            setStep('provider')
+          }
+        } else {
+          throw new Error('Stripe failed to load or Session ID is missing')
+        }
       }
-      showToast(errorMessage, 'error')
-      // Reset state on error
-      setSelectedProvider('stripe')
+    } catch (error: any) {
+      console.error(`[Checkout] ${provider} Init Error:`, error)
+      showToast(error.message || 'Payment initialization failed', 'error')
+      setLoading(false)
       setStep('provider')
     } finally {
-      setLoading(false)
+      if (provider !== 'stripe') {
+        setLoading(false)
+      }
     }
   }
 
-  const handleStripePayment = async () => {
-    if (!paymentIntent?.clientSecret) {
-      showToast('Payment intent not ready', 'error')
-      return
-    }
-
-    // Load Stripe.js
+  const handleStripeManualRedirect = async () => {
+    if (!paymentIntent?.id) return
     const stripe = (window as any).Stripe?.(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
-    if (!stripe) {
-      showToast('Stripe not loaded. Please refresh the page.', 'error')
-      return
-    }
-
-    setLoading(true)
-
-    try {
-      // Use Stripe's redirect to checkout for better UX
-      // This opens Stripe's hosted payment page
-      const { error } = await stripe.confirmCardPayment(paymentIntent.clientSecret, {
-        payment_method: {
-          card: {
-            // Stripe will handle card collection
-          },
-        },
-      })
-
-      if (error) {
-        // User cancelled or payment failed
-        if (error.type === 'card_error') {
-          showToast(error.message || 'Card payment failed', 'error')
-        } else if (error.type === 'validation_error') {
-          showToast(error.message || 'Invalid card details', 'error')
-        } else {
-          // User likely cancelled
-          showToast('Payment cancelled', 'info')
-        }
-        setLoading(false)
-        return
-      }
-
-      // Payment succeeded
-      showToast('Payment successful!', 'success')
-      setTimeout(() => {
-        onSuccess?.()
-        onClose()
-      }, 1500)
-    } catch (error: any) {
-      // Clean error message - remove URLs and technical details
-      let errorMessage = 'Payment was cancelled'
-      const errorStr = error?.message || error?.toString() || ''
-      if (errorStr && !errorStr.includes('http') && !errorStr.includes('fetch') && !errorStr.includes('axios')) {
-        errorMessage = errorStr
-      }
-      showToast(errorMessage, 'info')
-      setLoading(false)
+    if (stripe) {
+      setLoading(true)
+      await stripe.redirectToCheckout({ sessionId: paymentIntent.id })
     }
   }
 
   const handleRazorpayPayment = async () => {
-    if (!paymentIntent?.id) {
-      showToast('Payment intent not ready', 'error')
-      return
-    }
-
-    // Load Razorpay
+    if (!paymentIntent?.id) return
     const Razorpay = (window as any).Razorpay
     if (!Razorpay) {
-      showToast('Razorpay not loaded. Please refresh the page.', 'error')
+      showToast('Razorpay script not found', 'error')
       return
     }
 
     setLoading(true)
-
-    // Razorpay requires INR currency for UPI and Net Banking
-    // Force INR currency for Razorpay checkout
-    const razorpayCurrency = 'INR'
-    const razorpayAmount = paymentIntent.amount * 100 // Convert to paise
-
     const options: any = {
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-      amount: razorpayAmount, // Amount in paise (INR smallest unit)
-      currency: razorpayCurrency, // Always use INR for Razorpay (required for UPI/Net Banking)
+      amount: paymentIntent.amount * 100,
+      currency: 'INR',
       name: 'Whispering Palms',
-      description: `${planType} Plan - ${billingPeriod}`,
+      description: `${planType.toUpperCase()} - ${billingPeriod}`,
       order_id: paymentIntent.id,
-      // Explicitly enable UPI and Net Banking (only works with INR currency)
-      method: {
-        netbanking: true, // Enable Net Banking (INR only)
-        upi: true, // Enable UPI (INR only)
-        card: true, // Enable Cards
-        wallet: true, // Enable Wallets
-        emi: false, // Disable EMI
-      },
-      // Configure payment method display with custom blocks
-      config: {
-        display: {
-          blocks: {
-            banks: {
-              name: 'Net Banking',
-              instruments: [
-                {
-                  method: 'netbanking',
-                },
-              ],
-            },
-            upi: {
-              name: 'UPI',
-              instruments: [
-                {
-                  method: 'upi',
-                },
-              ],
-            },
-            cards: {
-              name: 'Cards',
-              instruments: [
-                {
-                  method: 'card',
-                },
-              ],
-            },
-            wallets: {
-              name: 'Wallets',
-              instruments: [
-                {
-                  method: 'wallet',
-                },
-              ],
-            },
-          },
-          // Display order: Net Banking first, then UPI, then Cards, then Wallets
-          sequence: ['block.banks', 'block.upi', 'block.cards', 'block.wallets'],
-          preferences: {
-            show_default_blocks: true,
-          },
-        },
-      },
       handler: async (response: any) => {
         try {
-          // Verify payment on backend
-          const verifyResponse = await fetch('/api/payments/verify', {
+          const verify = await fetch('/api/payments/verify', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -267,254 +150,146 @@ export default function CheckoutModal({
               signature: response.razorpay_signature,
             }),
           })
-
-          if (!verifyResponse.ok) {
-            const errorData = await verifyResponse.json().catch(() => ({}))
-            throw new Error(errorData.error || 'Payment verification failed')
-          }
-
-          showToast('Payment successful!', 'success')
-          setTimeout(() => {
+          if (verify.ok) {
+            showToast('Success!', 'success')
             onSuccess?.()
             onClose()
-          }, 1500)
-        } catch (error: any) {
-          // Clean error message - remove URLs and technical details
-          let errorMessage = 'Payment verification failed'
-          const errorStr = error?.message || error?.toString() || ''
-          if (errorStr && !errorStr.includes('http') && !errorStr.includes('fetch') && !errorStr.includes('axios') && !errorStr.includes('api/')) {
-            errorMessage = errorStr
+          } else {
+            throw new Error('Verification failed')
           }
-          showToast(errorMessage, 'error')
-        } finally {
-          setLoading(false)
-        }
+        } catch (e) {
+          showToast('Payment verification failed', 'error')
+        } finally { setLoading(false) }
       },
-      prefill: {
-        email: '', // Get from user profile
-        name: '',
-      },
-      theme: {
-        color: '#D4AF37', // Gold color matching app theme
-      },
+      prefill: { email: '', name: '' },
+      theme: { color: '#D4AF37' },
+      modal: { ondismiss: () => setLoading(false) }
     }
-
-    const razorpay = new Razorpay(options)
-    
-    // Handle payment cancellation
-    razorpay.on('payment.failed', (response: any) => {
-      showToast('Payment failed', 'error')
-      setLoading(false)
-    })
-    
-    razorpay.on('payment.cancelled', () => {
-      showToast('Payment cancelled', 'info')
-      setLoading(false)
-    })
-    
-    razorpay.open()
-    
-    // If user closes Razorpay modal without payment
-    setTimeout(() => {
-      if (loading) {
-        // Check if payment was actually initiated
-        // If still loading after 2 seconds and no handler called, user likely cancelled
-      }
-    }, 2000)
-  }
-
-  const handleBitcoinPayment = () => {
-    // Bitcoin payment flow
-    showToast('Bitcoin payment will open in a new window', 'info')
-    // In production, redirect to BTCPay Server invoice page
+    const rzp = new Razorpay(options)
+    rzp.open()
   }
 
   if (!isOpen) return null
 
   return (
-    <>
-      <div 
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-3 sm:p-4"
-        onClick={(e) => {
-          // Close modal when clicking backdrop (only if not loading)
-          if (!loading && e.target === e.currentTarget) {
-            onClose()
-          }
-        }}
-      >
-        <div 
-          className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {/* Header */}
-          <div className="sticky top-0 bg-gradient-to-br from-gold-50 to-gold-100 border-b border-gold-200 p-4 sm:p-6 rounded-t-2xl sm:rounded-t-3xl">
-            <div className="flex items-center justify-between gap-2">
-              <h2 className="text-xl sm:text-2xl font-bold text-text-primary">
-                {step === 'provider' ? t('subscription.choosePayment') : t('subscription.completePayment')}
-              </h2>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  if (loading) {
-                    // Ask for confirmation if payment is in progress
-                    if (window.confirm('Payment is in progress. Are you sure you want to cancel?')) {
-                      setLoading(false)
-                      setStep('provider')
-                      setPaymentIntent(null)
-                      setSelectedProvider('stripe')
-                      onClose()
-                    }
-                  } else {
-                    onClose()
-                  }
-                }}
-                className="p-1.5 sm:p-2 hover:bg-white/50 rounded-lg transition-colors z-10 relative cursor-pointer flex-shrink-0"
-                type="button"
-                aria-label="Close"
-              >
-                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+    <div className="fixed inset-0 z-[10000] flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-300">
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-md" onClick={!loading ? onClose : undefined} />
+
+      {/* Modal Card */}
+      <div className="relative bg-white w-full sm:max-w-md rounded-t-[2.5rem] sm:rounded-[3rem] shadow-2xl overflow-hidden animate-in slide-in-from-bottom duration-500">
+
+        {/* Header Section */}
+        <div className="p-6 pb-2 sm:p-8 sm:pb-4">
+          <button onClick={onClose} disabled={loading} className="absolute right-6 top-6 p-2 rounded-full hover:bg-beige-50 transition-colors disabled:opacity-30">
+            <svg className="w-5 h-5 text-text-tertiary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </button>
+
+          <div className="flex flex-col items-center text-center mt-2">
+            <div className="w-16 h-16 bg-gold-50 rounded-2xl flex items-center justify-center mb-4 shadow-inner">
+              <svg className="w-8 h-8 text-gold-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+              </svg>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-black text-text-primary uppercase tracking-tight">
+              {step === 'provider' ? 'Payment Method' : 'Confirming'}
+            </h2>
+            <div className="flex gap-2 mt-2">
+              <span className="bg-beige-100 text-text-tertiary text-[10px] font-black px-2 py-0.5 rounded-md uppercase">{planType}</span>
+              <span className="bg-beige-100 text-text-tertiary text-[10px] font-black px-2 py-0.5 rounded-md uppercase">{billingPeriod}</span>
             </div>
           </div>
+        </div>
 
-          {/* Content */}
-          <div className="p-4 sm:p-6">
-            {step === 'provider' ? (
-              <div className="space-y-3 sm:space-y-4">
-                <div className="bg-beige-50 rounded-lg sm:rounded-xl p-3 sm:p-4 mb-4 sm:mb-6">
-                  <p className="text-text-secondary text-xs sm:text-sm mb-1.5 sm:mb-2">
-                    {t('subscription.plan')}: <span className="font-semibold">{planType}</span>
-                  </p>
-                  <p className="text-text-secondary text-xs sm:text-sm mb-1.5 sm:mb-2">
-                    {t('subscription.billingPeriod')}: <span className="font-semibold">{billingPeriod}</span>
-                  </p>
-                  <p className="text-xl sm:text-2xl font-bold text-gold-600">
-                    {/* Show INR amount - always convert USD to INR for display */}
-                    {currency === 'USD' 
-                      ? `₹${inrAmount.toFixed(2)}` 
-                      : currency === 'INR'
-                      ? `₹${amount.toFixed(2)}`
-                      : `${currency} ${amount.toFixed(2)}`}
-                    {currency === 'USD' && (
-                      <span className="text-xs sm:text-sm text-text-secondary ml-1 sm:ml-2 font-normal">
-                        (≈ ${amount.toFixed(2)})
-                      </span>
-                    )}
-                  </p>
+        <div className="px-6 py-4 sm:px-8 sm:py-6 max-h-[70vh] overflow-y-auto">
+          {step === 'provider' ? (
+            <div className="space-y-6">
+              {/* Massive Amount Display */}
+              <div className="text-center py-4">
+                <div className="text-5xl sm:text-6xl font-black text-gold-600 tracking-tighter tabular-nums">
+                  ${amount}<span className="text-lg text-text-tertiary ml-1">USD</span>
                 </div>
-
-                <h3 className="text-base sm:text-lg font-semibold text-text-primary mb-3 sm:mb-4">
-                  {t('subscription.selectPaymentMethod')}
-                </h3>
-
-                <div className="grid gap-3 sm:gap-4">
-                  {/* Stripe */}
-                  <button
-                    onClick={() => handleProviderSelect('stripe')}
-                    disabled={loading}
-                    className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 border-2 border-beige-300 rounded-lg sm:rounded-xl hover:border-gold-400 hover:bg-gold-50 transition-all disabled:opacity-50"
-                  >
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.654.605 5.933 1.242l1.42-3.829c-1.257-.515-2.445-.899-4.582-.899-3.74 0-6.162 2.003-6.162 4.903 0 2.838 2.052 4.106 3.896 4.838 2.172.806 3.356 1.426 3.356 2.409 0 .98-.84 1.545-2.227 1.545-1.901 0-4.654-.731-6.162-1.545l-1.42 3.829c1.5.605 3.58 1.242 6.162 1.242 3.896 0 6.162-2.003 6.162-4.903 0-2.838-2.052-4.106-3.896-4.838z"/>
-                      </svg>
-                    </div>
-                    <div className="flex-1 text-left min-w-0">
-                      <p className="font-semibold text-text-primary text-sm sm:text-base">Card Payment</p>
-                      <p className="text-xs sm:text-sm text-text-secondary">Visa, Mastercard, Amex</p>
-                    </div>
-                    <svg className="w-5 h-5 sm:w-6 sm:h-6 text-text-tertiary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
-
-                  {/* Razorpay */}
-                  <button
-                    onClick={() => handleProviderSelect('razorpay')}
-                    disabled={loading}
-                    className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 border-2 border-beige-300 rounded-lg sm:rounded-xl hover:border-gold-400 hover:bg-gold-50 transition-all disabled:opacity-50"
-                  >
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <span className="text-white font-bold text-base sm:text-lg">R</span>
-                    </div>
-                    <div className="flex-1 text-left min-w-0">
-                      <p className="font-semibold text-text-primary text-sm sm:text-base">Razorpay</p>
-                      <p className="text-xs sm:text-sm text-text-secondary">UPI, Cards, Net Banking, Wallets</p>
-                    </div>
-                    <svg className="w-5 h-5 sm:w-6 sm:h-6 text-text-tertiary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
-
-                  {/* Bitcoin */}
-                  <button
-                    onClick={() => handleProviderSelect('bitcoin')}
-                    disabled={loading}
-                    className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 border-2 border-beige-300 rounded-lg sm:rounded-xl hover:border-gold-400 hover:bg-gold-50 transition-all disabled:opacity-50"
-                  >
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <span className="text-white font-bold text-base sm:text-lg">₿</span>
-                    </div>
-                    <div className="flex-1 text-left min-w-0">
-                      <p className="font-semibold text-text-primary text-sm sm:text-base">Bitcoin</p>
-                      <p className="text-xs sm:text-sm text-text-secondary">Cryptocurrency payment</p>
-                    </div>
-                    <svg className="w-5 h-5 sm:w-6 sm:h-6 text-text-tertiary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
+                <div className="text-sm font-bold text-text-tertiary mt-1">
+                  ≈ ₹{inrAmount.toFixed(0)} <span className="font-normal opacity-60">(Estimated)</span>
                 </div>
               </div>
-            ) : (
-              <div className="space-y-4 sm:space-y-6">
-                <div className="text-center">
-                  <p className="text-text-secondary mb-3 sm:mb-4 text-sm sm:text-base">
-                    {t('subscription.completingPayment')}...
-                  </p>
-                  {selectedProvider === 'stripe' && (
-                    <button
-                      onClick={handleStripePayment}
-                      disabled={loading}
-                      className="w-full px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-gold-500 to-gold-600 text-white rounded-lg sm:rounded-xl font-semibold hover:from-gold-600 hover:to-gold-700 transition-all disabled:opacity-50 text-sm sm:text-base"
-                    >
-                      {loading ? t('common.loading') : t('subscription.payNow')}
-                    </button>
-                  )}
-                  {selectedProvider === 'razorpay' && (
-                    <button
-                      onClick={handleRazorpayPayment}
-                      disabled={loading}
-                      className="w-full px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-gold-500 to-gold-600 text-white rounded-lg sm:rounded-xl font-semibold hover:from-gold-600 hover:to-gold-700 transition-all disabled:opacity-50 text-sm sm:text-base"
-                    >
-                      {loading ? t('common.loading') : t('subscription.payNow')}
-                    </button>
-                  )}
-                  {selectedProvider === 'bitcoin' && (
-                    <button
-                      onClick={handleBitcoinPayment}
-                      disabled={loading}
-                      className="w-full px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-gold-500 to-gold-600 text-white rounded-lg sm:rounded-xl font-semibold hover:from-gold-600 hover:to-gold-700 transition-all disabled:opacity-50 text-sm sm:text-base"
-                    >
-                      {loading ? t('common.loading') : t('subscription.payNow')}
-                    </button>
-                  )}
-                </div>
+
+              {/* Provider Buttons */}
+              <div className="grid gap-3">
+                <button
+                  onClick={() => handleProviderSelect('stripe')}
+                  disabled={loading}
+                  className="flex items-center justify-between p-4 bg-white border-2 border-beige-100 rounded-2xl hover:border-gold-400 hover:shadow-lg transition-all active:scale-[0.98] group disabled:opacity-50"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-[#635BFF] text-white rounded-xl flex items-center justify-center font-bold text-xl group-hover:scale-110 transition-transform">S</div>
+                    <div className="text-left">
+                      <p className="font-bold text-text-primary text-sm sm:text-base">International Card</p>
+                      <p className="text-[10px] text-text-tertiary uppercase font-black tracking-wider">Visa, Amex, Apple Pay</p>
+                    </div>
+                  </div>
+                  <svg className="w-5 h-5 text-beige-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 5l7 7-7 7" /></svg>
+                </button>
+
+                <button
+                  onClick={() => handleProviderSelect('razorpay')}
+                  disabled={loading}
+                  className="flex items-center justify-between p-4 bg-white border-2 border-beige-100 rounded-2xl hover:border-gold-400 hover:shadow-lg transition-all active:scale-[0.98] group disabled:opacity-50"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-[#3395FF] text-white rounded-xl flex items-center justify-center font-bold text-xl group-hover:scale-110 transition-transform">R</div>
+                    <div className="text-left">
+                      <p className="font-bold text-text-primary text-sm sm:text-base">UPI / NetBanking</p>
+                      <p className="text-[10px] text-text-tertiary uppercase font-black tracking-wider">GPay, PhonePe, Cards (INR)</p>
+                    </div>
+                  </div>
+                  <svg className="w-5 h-5 text-beige-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M9 5l7 7-7 7" /></svg>
+                </button>
               </div>
-            )}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center py-12 text-center">
+              <div className="relative mb-8">
+                <div className="w-20 h-20 border-4 border-gold-100 border-t-gold-600 rounded-full animate-spin"></div>
+                <div className="absolute inset-0 flex items-center justify-center text-xl font-bold text-gold-600">$</div>
+              </div>
+              <h3 className="text-lg font-bold text-text-primary mb-2">Redirecting Securely</h3>
+              <p className="text-sm text-text-secondary px-4">We are opening the payment gateway. Do not close this browser.</p>
+
+              {selectedProvider === 'stripe' && (
+                <button onClick={handleStripeManualRedirect} className="mt-8 text-gold-600 font-black text-xs uppercase tracking-widest hover:underline px-4 py-2">
+                  Click here if not redirected
+                </button>
+              )}
+              {selectedProvider === 'razorpay' && (
+                <button onClick={handleRazorpayPayment} className="mt-8 px-10 py-4 bg-gold-600 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-gold-200 shadow-xl">
+                  Open Razorpay
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Footer info */}
+        <div className="p-6 bg-beige-50/50 flex items-center justify-center gap-4">
+          <div className="flex items-center gap-1.5 opacity-50">
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" /><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z" /></svg>
+            <span className="text-[10px] font-black uppercase tracking-widest">SSL Secure</span>
+          </div>
+          <div className="w-px h-3 bg-beige-200" />
+          <div className="flex items-center gap-1.5 opacity-50">
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+            <span className="text-[10px] font-black uppercase tracking-widest">Encrypted</span>
           </div>
         </div>
       </div>
 
+      {/* Toast */}
       {toast.isVisible && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          isVisible={toast.isVisible}
-          onClose={() => setToast(prev => ({ ...prev, isVisible: false }))}
-        />
+        <Toast message={toast.message} type={toast.type} isVisible={toast.isVisible} onClose={() => setToast(p => ({ ...p, isVisible: false }))} />
       )}
-    </>
+    </div>
   )
 }

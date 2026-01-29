@@ -6,10 +6,23 @@ import Link from 'next/link'
 import QuestionPanel from '@/app/components/QuestionPanel'
 import LanguageSwitcher from '@/app/components/LanguageSwitcher'
 import { useI18n } from '@/app/hooks/useI18n'
+import Toast from '@/app/components/Toast'
+import { useState } from 'react'
 
 export default function ChatPage() {
   const router = useRouter()
   const { t } = useI18n()
+
+  const [loading, setLoading] = useState(false)
+  const [toast, setToast] = useState<{
+    message: string
+    type: 'success' | 'error' | 'warning' | 'info'
+    isVisible: boolean
+  }>({
+    message: '',
+    type: 'info',
+    isVisible: false,
+  })
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -23,7 +36,50 @@ export default function ChatPage() {
       }
     }
     checkAuth()
+
+    // Check for Stripe Checkout Session fallback
+    const params = new URLSearchParams(window.location.search)
+    const sessionId = params.get('session_id')
+    const status = params.get('status')
+
+    if (sessionId && status === 'success') {
+      verifyStripeSession(sessionId)
+    }
   }, [router])
+
+  const verifyStripeSession = async (sessionId: string) => {
+    try {
+      setLoading(true)
+      console.log('[Chat] Verifying payment session:', sessionId)
+      const response = await fetch(`/api/payments/verify-session?session_id=${sessionId}`)
+
+      const contentType = response.headers.get('content-type')
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text()
+        console.error('[Chat] Unexpected response from verify-session:', text.substring(0, 100))
+        return
+      }
+
+      const result = await response.json()
+
+      if (response.ok && result.success) {
+        console.log('[Chat] Payment verified! Plan updated to:', result.plan)
+        setToast({
+          message: `Success! Your ${result.plan} plan is now active.`,
+          type: 'success',
+          isVisible: true
+        })
+        // Clean up URL
+        window.history.replaceState({}, '', '/chat')
+        // Force refresh components that use quota
+        window.dispatchEvent(new CustomEvent('planChanged', { detail: { planType: result.plan } }))
+      }
+    } catch (error) {
+      console.error('[Chat] Session verification failed:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <main className="h-screen flex flex-col bg-gradient-soft">
@@ -107,9 +163,24 @@ export default function ChatPage() {
       </div>
 
       {/* Question Panel Component */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden relative">
+        {loading && (
+          <div className="absolute inset-0 z-50 bg-white/60 backdrop-blur-sm flex items-center justify-center">
+            <div className="text-center">
+              <div className="w-12 h-12 border-4 border-gold-200 border-t-gold-600 rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-text-primary font-bold">Activating your plan...</p>
+            </div>
+          </div>
+        )}
         <QuestionPanel />
       </div>
+
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={() => setToast({ ...toast, isVisible: false })}
+      />
     </main>
   )
 }

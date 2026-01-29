@@ -14,35 +14,47 @@ export class StripeProvider implements PaymentProviderInterface {
       throw new Error('STRIPE_SECRET_KEY is not configured')
     }
     this.stripe = new Stripe(secretKey, {
-      apiVersion: '2024-11-20.acacia',
+      apiVersion: '2025-02-24.acacia',
     })
   }
 
   async createPaymentIntent(params: CreatePaymentIntentParams): Promise<PaymentIntent> {
     const { userId, amount, currency, planType, billingPeriod, metadata } = params
 
-    const intent = await this.stripe.paymentIntents.create({
-      amount: Math.round(amount * 100), // Convert to cents
-      currency: currency.toLowerCase(),
+    // For subscriptions, we prefer Checkout Sessions
+    // Get the Price ID for this plan/period
+    const priceId = this.getPriceId(planType, billingPeriod)
+
+    const session = await this.stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price: priceId,
+          quantity: 1,
+        },
+      ],
+      mode: 'subscription',
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/chat?session_id={CHECKOUT_SESSION_ID}&status=success`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/subscription?status=canceled`,
+      client_reference_id: userId,
+      allow_promotion_codes: true,
       metadata: {
         userId,
         planType,
         billingPeriod,
         ...metadata,
       },
-      automatic_payment_methods: {
-        enabled: true,
-      },
+      customer_email: metadata?.email,
     })
 
     return {
-      id: intent.id,
+      id: session.id,
       provider: 'stripe',
-      amount: intent.amount / 100,
-      currency: intent.currency.toUpperCase(),
-      status: this.normalizePaymentStatus(intent.status),
-      clientSecret: intent.client_secret || undefined,
-      metadata: intent.metadata as Record<string, string>,
+      amount: amount,
+      currency: currency.toUpperCase(),
+      status: 'pending',
+      clientSecret: session.id, // We use sessionId as the identifier here
+      metadata: session.metadata as Record<string, string>,
     }
   }
 
@@ -135,7 +147,7 @@ export class StripeProvider implements PaymentProviderInterface {
     updates: Partial<Pick<Subscription, 'planType' | 'billingPeriod'>>
   ): Promise<Subscription> {
     const subscription = await this.stripe.subscriptions.retrieve(subscriptionId)
-    
+
     const newPriceId = updates.planType && updates.billingPeriod
       ? this.getPriceId(updates.planType, updates.billingPeriod)
       : undefined
@@ -228,14 +240,14 @@ export class StripeProvider implements PaymentProviderInterface {
       'superflame_monthly': process.env.STRIPE_PRICE_SUPERFLAME_MONTHLY || '',
       'superflame_yearly': process.env.STRIPE_PRICE_SUPERFLAME_YEARLY || '',
     }
-    
+
     const key = `${planType}_${billingPeriod}`
     const priceId = priceMap[key]
-    
+
     if (!priceId) {
       throw new Error(`Price ID not configured for ${planType} ${billingPeriod}`)
     }
-    
+
     return priceId
   }
 

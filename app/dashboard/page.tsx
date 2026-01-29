@@ -94,7 +94,38 @@ export default function DashboardPage() {
     setMounted(true)
     checkAuth()
     fetchQuota()
+
+    // Check for Stripe Checkout Session fallback
+    const params = new URLSearchParams(window.location.search)
+    const sessionId = params.get('session_id')
+    const status = params.get('status')
+
+    if (sessionId && status === 'success') {
+      verifyStripeSession(sessionId)
+    }
   }, [])
+
+  const verifyStripeSession = async (sessionId: string) => {
+    try {
+      setLoading(true)
+      console.log('[Dashboard] Verifying payment session:', sessionId)
+      const response = await fetch(`/api/payments/verify-session?session_id=${sessionId}`)
+      const result = await response.json()
+
+      if (response.ok && result.success) {
+        console.log('[Dashboard] Payment verified! Plan updated to:', result.plan)
+        // Clean up URL
+        window.history.replaceState({}, '', '/dashboard')
+        // Refresh data
+        await fetchQuota()
+        await checkAuth()
+      }
+    } catch (error) {
+      console.error('[Dashboard] Session verification failed:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
     if (quota) {
@@ -120,8 +151,15 @@ export default function DashboardPage() {
   const fetchQuota = async () => {
     try {
       const response = await fetch('/api/quota')
-      const result = await response.json()
 
+      const contentType = response.headers.get('content-type')
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text()
+        console.warn('[Dashboard] API returned HTML instead of JSON:', text.substring(0, 100))
+        return
+      }
+
+      const result = await response.json()
       if (response.ok && result.data?.quota) {
         setQuota(result.data.quota)
       }
