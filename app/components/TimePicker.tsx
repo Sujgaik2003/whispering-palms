@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 
 interface TimePickerProps {
   value: string
@@ -10,6 +11,8 @@ interface TimePickerProps {
 
 export default function TimePicker({ value, onChange, className = '' }: TimePickerProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const [buttonRect, setButtonRect] = useState<DOMRect | null>(null)
+  const [mounted, setMounted] = useState(false)
   const [hours, setHours] = useState(() => {
     if (value) {
       const [h] = value.split(':')
@@ -32,17 +35,44 @@ export default function TimePicker({ value, onChange, className = '' }: TimePick
     return true
   })
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node) &&
+        buttonRef.current && !buttonRef.current.contains(event.target as Node)) {
         setIsOpen(false)
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside)
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+      if (buttonRef.current) {
+        setButtonRect(buttonRef.current.getBoundingClientRect())
+      }
+    }
     return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+  }, [isOpen])
+
+  // Update rect on scroll or resize when open
+  useEffect(() => {
+    const updateRect = () => {
+      if (isOpen && buttonRef.current) {
+        setButtonRect(buttonRef.current.getBoundingClientRect())
+      }
+    }
+
+    window.addEventListener('scroll', updateRect, true)
+    window.addEventListener('resize', updateRect)
+    return () => {
+      window.removeEventListener('scroll', updateRect, true)
+      window.removeEventListener('resize', updateRect)
+    }
+  }, [isOpen])
 
   const formatTime = (h: number, m: number, am: boolean) => {
     let hour24 = h
@@ -73,7 +103,7 @@ export default function TimePicker({ value, onChange, className = '' }: TimePick
   const minuteOptions = Array.from({ length: 60 }, (_, i) => i)
 
   return (
-    <div className={`relative ${className}`} ref={dropdownRef}>
+    <div className={`relative ${className}`} ref={buttonRef}>
       <input
         type="text"
         value={formatDisplayTime(value)}
@@ -83,21 +113,30 @@ export default function TimePicker({ value, onChange, className = '' }: TimePick
         placeholder="Select time of birth"
       />
 
-      {isOpen && (
-        <div className="absolute z-50 mt-2 bg-white border border-beige-300 rounded-xl shadow-soft-xl p-4 w-64">
-          <div className="flex gap-4">
+      {mounted && isOpen && buttonRect && createPortal(
+        <div
+          ref={dropdownRef}
+          className="bg-white border border-beige-300 rounded-[2rem] shadow-soft-2xl p-4 sm:p-6 w-[300px] xs:w-[350px] origin-top animate-scale-in"
+          style={{
+            zIndex: 2147483647,
+            position: 'fixed',
+            top: `${buttonRect.bottom + 8}px`,
+            left: `${Math.min(window.innerWidth - (window.innerWidth < 420 ? 312 : 362), Math.max(12, buttonRect.left))}px`
+          }}
+        >
+          <div className="flex gap-4 sm:gap-6">
             {/* Hours */}
-            <div className="flex-1">
-              <div className="text-center text-text-secondary text-sm font-semibold mb-2">Hour</div>
-              <div className="max-h-48 overflow-y-auto space-y-1">
+            <div className="flex-1 min-w-[70px]">
+              <div className="text-center text-text-tertiary text-[10px] font-bold mb-3 uppercase tracking-[0.15em] font-sans">Hour</div>
+              <div className="max-h-[220px] overflow-y-auto space-y-1.5 scrollbar-hide py-1">
                 {hourOptions.map((hour) => (
                   <button
                     key={hour}
                     type="button"
                     onClick={() => handleTimeChange(hour, minutes, isAM)}
-                    className={`w-full px-3 py-2 rounded transition-colors ${hours === hour
-                        ? 'bg-gold-500 text-white'
-                        : 'text-text-primary hover:bg-beige-50'
+                    className={`w-full py-2.5 rounded-xl transition-all text-sm font-bold ${hours === hour
+                      ? 'bg-gold-500 text-white shadow-soft-lg scale-105 z-10'
+                      : 'text-text-primary hover:bg-beige-50'
                       }`}
                   >
                     {hour.toString().padStart(2, '0')}
@@ -107,17 +146,17 @@ export default function TimePicker({ value, onChange, className = '' }: TimePick
             </div>
 
             {/* Minutes */}
-            <div className="flex-1">
-              <div className="text-center text-text-secondary text-sm font-semibold mb-2">Minute</div>
-              <div className="max-h-48 overflow-y-auto space-y-1">
+            <div className="flex-1 min-w-[70px]">
+              <div className="text-center text-text-tertiary text-[10px] font-bold mb-3 uppercase tracking-[0.15em] font-sans">Minute</div>
+              <div className="max-h-[220px] overflow-y-auto space-y-1.5 scrollbar-hide py-1">
                 {minuteOptions.map((minute) => (
                   <button
                     key={minute}
                     type="button"
                     onClick={() => handleTimeChange(hours, minute, isAM)}
-                    className={`w-full px-3 py-2 rounded transition-colors ${minutes === minute
-                        ? 'bg-gold-500 text-white'
-                        : 'text-text-primary hover:bg-beige-50'
+                    className={`w-full py-2.5 rounded-xl transition-all text-sm font-bold ${minutes === minute
+                      ? 'bg-gold-500 text-white shadow-soft-lg scale-105 z-10'
+                      : 'text-text-primary hover:bg-beige-50'
                       }`}
                   >
                     {minute.toString().padStart(2, '0')}
@@ -127,27 +166,34 @@ export default function TimePicker({ value, onChange, className = '' }: TimePick
             </div>
 
             {/* AM/PM */}
-            <div className="flex flex-col gap-2">
-              <div className="text-center text-text-secondary text-sm font-semibold mb-2">Period</div>
-              <button
-                type="button"
-                onClick={() => handleTimeChange(hours, minutes, true)}
-                className={`px-4 py-2 rounded transition-colors ${isAM ? 'bg-gold-500 text-white' : 'text-text-primary hover:bg-beige-50'
-                  }`}
-              >
-                AM
-              </button>
-              <button
-                type="button"
-                onClick={() => handleTimeChange(hours, minutes, false)}
-                className={`px-4 py-2 rounded transition-colors ${!isAM ? 'bg-gold-500 text-white' : 'text-text-primary hover:bg-beige-50'
-                  }`}
-              >
-                PM
-              </button>
+            <div className="flex flex-col gap-3 min-w-[80px]">
+              <div className="text-center text-text-tertiary text-[10px] font-bold mb-3 uppercase tracking-[0.15em] font-sans">Period</div>
+              <div className="flex flex-col gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleTimeChange(hours, minutes, true)}
+                  className={`w-full py-3.5 rounded-xl transition-all text-xs font-black tracking-widest ${isAM
+                    ? 'bg-gold-500 text-white shadow-soft-lg scale-105 z-10'
+                    : 'text-text-primary border-2 border-beige-100 hover:border-gold-300 hover:bg-beige-50'
+                    }`}
+                >
+                  AM
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleTimeChange(hours, minutes, false)}
+                  className={`w-full py-3.5 rounded-xl transition-all text-xs font-black tracking-widest ${!isAM
+                    ? 'bg-gold-500 text-white shadow-soft-lg scale-105 z-10'
+                    : 'text-text-primary border-2 border-beige-100 hover:border-gold-300 hover:bg-beige-50'
+                    }`}
+                >
+                  PM
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )

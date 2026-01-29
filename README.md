@@ -65,18 +65,24 @@ JWT_SECRET=your-super-secret-jwt-key-change-this
 JWT_EXPIRES_IN=7d
 
 # Email Configuration (Choose ONE)
-# Option A: Resend (Recommended)
+# Option A: Zoho Mail (Recommended for Production)
+EMAIL_PROVIDER=zoho
+ZOHO_MAIL_USER=noreply@yourdomain.com
+ZOHO_MAIL_PASSWORD=your-zoho-mail-password
+
+# Option B: Resend (Alternative Production Option)
 EMAIL_PROVIDER=resend
 RESEND_API_KEY=re_your_resend_api_key
 EMAIL_FROM=noreply@yourdomain.com
 
-# Option B: Gmail SMTP
+# Option C: Gmail SMTP (Testing Only)
 EMAIL_PROVIDER=gmail
 GMAIL_USER=your-email@gmail.com
 GMAIL_APP_PASSWORD=your-app-specific-password
 
 # Email Testing (set to false in production)
 EMAIL_TEST_MODE=false
+
 
 # Email Branding (Optional)
 COMPANY_LOGO_URL=https://your-domain.com/logo.png

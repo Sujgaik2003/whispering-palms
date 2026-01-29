@@ -14,20 +14,24 @@ import nodemailer from 'nodemailer'
 /**
  * Email Provider Type
  * 'resend' - Use Resend API (production-ready)
+ * 'zoho' - Use Zoho Mail SMTP (production-ready, professional email)
  * 'gmail' - Use Gmail SMTP (testing/PoC only)
  */
-type EmailProvider = 'resend' | 'gmail'
+type EmailProvider = 'resend' | 'zoho' | 'gmail'
 
 /**
  * Get email provider from environment variable
- * Defaults to 'resend' if not specified
+ * Defaults to 'zoho' if not specified (production-ready)
  */
 function getEmailProvider(): EmailProvider {
   const provider = process.env.EMAIL_PROVIDER?.toLowerCase()
   if (provider === 'gmail' || provider === 'smtp') {
     return 'gmail'
   }
-  return 'resend'
+  if (provider === 'zoho' || provider === 'zohomail') {
+    return 'zoho'
+  }
+  return 'zoho' // Default to Zoho for professional emails
 }
 
 /**
@@ -35,12 +39,35 @@ function getEmailProvider(): EmailProvider {
  */
 function getResendClient() {
   const apiKey = process.env.RESEND_API_KEY
-  
+
   if (!apiKey) {
     throw new Error('RESEND_API_KEY is not configured. Please add it to .env.local and restart the server.')
   }
-  
+
   return new Resend(apiKey)
+}
+
+/**
+ * Get or create Zoho Mail SMTP transporter (lazy initialization)
+ * PRODUCTION-READY - Professional email delivery
+ */
+function getZohoTransporter() {
+  const zohoUser = process.env.ZOHO_MAIL_USER
+  const zohoPassword = process.env.ZOHO_MAIL_PASSWORD
+
+  if (!zohoUser || !zohoPassword) {
+    throw new Error('Zoho Mail SMTP not configured. Please set ZOHO_MAIL_USER and ZOHO_MAIL_PASSWORD in .env.local')
+  }
+
+  return nodemailer.createTransport({
+    host: 'smtp.zoho.com',
+    port: 465,
+    secure: true, // Use SSL
+    auth: {
+      user: zohoUser,
+      pass: zohoPassword,
+    },
+  })
 }
 
 /**
@@ -50,11 +77,11 @@ function getResendClient() {
 function getGmailTransporter() {
   const gmailUser = process.env.GMAIL_USER
   const gmailAppPassword = process.env.GMAIL_APP_PASSWORD
-  
+
   if (!gmailUser || !gmailAppPassword) {
     throw new Error('Gmail SMTP not configured. Please set GMAIL_USER and GMAIL_APP_PASSWORD in .env.local')
   }
-  
+
   return nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -65,22 +92,45 @@ function getGmailTransporter() {
 }
 
 /**
- * Send email using configured provider (Resend or Gmail SMTP)
- * Gmail SMTP is for testing/PoC only - use Resend for production
+ * Send email using configured provider (Zoho, Resend, or Gmail SMTP)
+ * Zoho Mail is recommended for production - professional and reliable
  */
 async function sendEmail(to: string, subject: string, html: string): Promise<void> {
   const provider = getEmailProvider()
-  
-  if (provider === 'gmail') {
+
+  if (provider === 'zoho') {
+    // Zoho Mail SMTP (Production-ready)
+    console.log('📧 Using Zoho Mail SMTP (Production)')
+
+    if (!process.env.ZOHO_MAIL_USER || !process.env.ZOHO_MAIL_PASSWORD) {
+      throw new Error('Zoho Mail SMTP not configured. Please set ZOHO_MAIL_USER and ZOHO_MAIL_PASSWORD in .env.local')
+    }
+
+    const transporter = getZohoTransporter()
+
+    try {
+      const info = await transporter.sendMail({
+        from: `"Whispering Palms" <${process.env.ZOHO_MAIL_USER}>`,
+        to,
+        subject,
+        html,
+      })
+
+      console.log('✅ Email sent via Zoho Mail:', info.messageId)
+    } catch (error) {
+      console.error('Zoho Mail SMTP error:', error)
+      throw new Error(`Failed to send email via Zoho Mail: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    }
+  } else if (provider === 'gmail') {
     // Gmail SMTP (Testing/PoC only)
     console.log('📧 Using Gmail SMTP (Testing mode)')
-    
+
     if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
       throw new Error('Gmail SMTP not configured. Please set GMAIL_USER and GMAIL_APP_PASSWORD in .env.local')
     }
-    
+
     const transporter = getGmailTransporter()
-    
+
     try {
       const info = await transporter.sendMail({
         from: `"Whispering Palms" <${process.env.GMAIL_USER}>`,
@@ -88,7 +138,7 @@ async function sendEmail(to: string, subject: string, html: string): Promise<voi
         subject,
         html,
       })
-      
+
       console.log('✅ Email sent via Gmail SMTP:', info.messageId)
     } catch (error) {
       console.error('Gmail SMTP error:', error)
@@ -97,7 +147,7 @@ async function sendEmail(to: string, subject: string, html: string): Promise<voi
   } else {
     // Resend API (Production)
     console.log('📧 Using Resend API')
-    
+
     if (!process.env.RESEND_API_KEY) {
       throw new Error('RESEND_API_KEY is not configured. Please add it to .env.local and restart the server.')
     }
@@ -132,15 +182,28 @@ async function sendEmail(to: string, subject: string, html: string): Promise<voi
 export async function POST(request: NextRequest) {
   try {
     const emailProvider = getEmailProvider()
-    
+
     // Debug: Check environment variables
     console.log('🔍 Environment check:')
-    console.log('  Email Provider:', emailProvider === 'gmail' ? 'Gmail SMTP (Testing)' : 'Resend API')
-    
-    if (emailProvider === 'gmail') {
+    console.log('  Email Provider:',
+      emailProvider === 'zoho' ? 'Zoho Mail (Production)' :
+        emailProvider === 'gmail' ? 'Gmail SMTP (Testing)' : 'Resend API'
+    )
+
+    if (emailProvider === 'zoho') {
+      console.log('  ZOHO_MAIL_USER:', process.env.ZOHO_MAIL_USER ? '✅ Set' : '❌ Missing')
+      console.log('  ZOHO_MAIL_PASSWORD:', process.env.ZOHO_MAIL_PASSWORD ? '✅ Set' : '❌ Missing')
+
+      if (!process.env.ZOHO_MAIL_USER || !process.env.ZOHO_MAIL_PASSWORD) {
+        return createErrorResponse(
+          'Zoho Mail not configured. Please set ZOHO_MAIL_USER and ZOHO_MAIL_PASSWORD in .env.local',
+          500
+        )
+      }
+    } else if (emailProvider === 'gmail') {
       console.log('  GMAIL_USER:', process.env.GMAIL_USER ? '✅ Set' : '❌ Missing')
       console.log('  GMAIL_APP_PASSWORD:', process.env.GMAIL_APP_PASSWORD ? '✅ Set' : '❌ Missing')
-      
+
       if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
         return createErrorResponse(
           'Gmail SMTP not configured. Please set GMAIL_USER and GMAIL_APP_PASSWORD in .env.local',
@@ -150,14 +213,14 @@ export async function POST(request: NextRequest) {
     } else {
       console.log('  RESEND_API_KEY:', process.env.RESEND_API_KEY ? '✅ Set' : '❌ Missing')
       console.log('  EMAIL_FROM:', process.env.EMAIL_FROM || '❌ Missing')
-      
+
       if (!process.env.RESEND_API_KEY) {
         return createErrorResponse(
           'RESEND_API_KEY is not configured. Please add it to .env.local and restart the server.',
           500
         )
       }
-      
+
       if (!process.env.EMAIL_FROM) {
         return createErrorResponse(
           'EMAIL_FROM is not configured. Please add it to .env.local',
@@ -165,9 +228,9 @@ export async function POST(request: NextRequest) {
         )
       }
     }
-    
+
     console.log('  EMAIL_TEST_MODE:', process.env.EMAIL_TEST_MODE || 'false')
-    
+
     const supabase = await createClient()
     const now = new Date()
 
@@ -212,17 +275,17 @@ export async function POST(request: NextRequest) {
       const deliveryTime = new Date(emailMetadata.delivery_time)
       const isTestMode = process.env.EMAIL_TEST_MODE === 'true'
       const isGmailProvider = emailProvider === 'gmail'
-      
+
       // Gmail SMTP: Always send immediately (testing mode)
-      // Resend: Respect delivery time unless test mode is enabled
+      // Zoho/Resend: Respect delivery time unless test mode is enabled
       if (isGmailProvider) {
         // Gmail SMTP - always send immediately for testing
         console.log(`📧 Gmail SMTP: Sending email immediately (scheduled for ${deliveryTime.toISOString()})`)
       } else if (!isTestMode && now < deliveryTime) {
-        // Resend - production mode: respect scheduled delivery time
+        // Production mode: respect scheduled delivery time
         continue
       } else if (isTestMode && now < deliveryTime) {
-        // Resend - test mode: send immediately
+        // Test mode: send immediately
         console.log(`🧪 TEST MODE: Sending email immediately (scheduled for ${deliveryTime.toISOString()})`)
       }
 

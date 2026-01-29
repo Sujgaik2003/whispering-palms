@@ -25,7 +25,7 @@ export default {
   'common.unlimitedQuestionsPerDay': 'Questions illimitées par jour',
   'common.pleaseReUpload': 'Veuillez télécharger ou capturer à nouveau les deux paumes',
   'common.loading': 'Chargement...',
-  
+
   // Dashboard
   'dashboard.title': 'Palmes Chuchotantes',
   'dashboard.completeProfile': 'Compléter le profil',
@@ -45,7 +45,7 @@ export default {
   'dashboard.reUpload': 'Télécharger à nouveau',
   'dashboard.uploadYourPalms': 'Téléchargez vos paumes',
   'dashboard.uploadBothPalms': 'Téléchargez les images des paumes droite et gauche pour vérifier qu\'elles correspondent',
-  
+
   // Chat/Questions
   'chat.title': 'Poser une question',
   'chat.placeholder': 'Tapez votre question ici...',
@@ -55,7 +55,7 @@ export default {
   'chat.sent': 'Envoyé',
   'chat.checkEmail': 'Vérifiez votre e-mail',
   'chat.noQuestions': 'Aucune question pour le moment',
-  
+
   // Subscription
   'subscription.title': 'Choisissez votre plan',
   'subscription.backToDashboard': 'Retour au tableau de bord',
@@ -84,13 +84,13 @@ export default {
   'subscription.mostPopular': 'Le Plus Populaire',
   'subscription.questionsPerDay': 'Questions par jour',
   'subscription.deliveryTime': 'Délai de livraison',
-  
+
   // Settings
   'settings.title': 'Paramètres',
   'settings.profile': 'Profil',
   'settings.save': 'Enregistrer',
   'settings.cancel': 'Annuler',
-  
+
   // Auth
   'auth.login': 'Connexion',
   'auth.register': 'S\'inscrire',
@@ -123,7 +123,7 @@ export default {
   'auth.loginFailed': 'Échec de la connexion',
   'auth.registrationFailed': 'Échec de l\'inscription',
   'auth.registrationSuccess': 'Inscription réussie!',
-  
+
   // Home page
   'home.tagline': 'La sagesse indienne ancienne rencontre la technologie moderne',
   'home.description': 'Découvrez votre destin à travers la chiromancie et l\'astrologie. Obtenez des informations personnalisées de notre astrologue expert, combinant des siècles de connaissances védiques avec une analyse moderne.',
@@ -133,14 +133,14 @@ export default {
   'home.palmReading': 'Lecture des paumes',
   'home.palmReadingDesc': 'Analyse experte de chiromancie à partir de vos images de paumes',
   'home.expertGuidance': 'Conseils d\'expert',
-  'home.expertGuidanceDesc': 'Discutez avec notre astrologue expert pour des conseils personnalisés',
+  'home.expertGuidanceDesc': 'Posez des questions et obtenez des réponses détaillées par e-mail personnalisé',
   'home.expertAstrologer': 'Astrologue expert',
   'home.vedicWisdom': 'Sagesse védique',
   'home.securePrivate': 'Sécurisé et Privé',
   'home.termsConditions': 'Termes et Conditions',
   'home.privacyPolicy': 'Politique de Confidentialité',
   'home.copyright': 'Tous droits réservés',
-  
+
   // Onboarding - French (using English as fallback for now, can be translated later)
   'onboarding.welcome': 'Bienvenue sur Palmes Chuchotantes',
   'onboarding.welcomeDesc': 'Commençons par configurer vos informations de base',
@@ -168,7 +168,7 @@ export default {
   'onboarding.saving': 'Enregistrement...',
   'onboarding.enterFullName': 'Entrez votre nom complet',
   'onboarding.failedToSave': 'Échec de l\'enregistrement du profil',
-  
+
   // Settings - French
   'settings.manageProfile': 'Gérez votre profil et vos préférences',
   'settings.backToDashboard': 'Retour au Tableau de Bord',
@@ -183,7 +183,7 @@ export default {
   'settings.profileUpdated': 'Profil mis à jour avec succès!',
   'settings.profileUpdateFailed': 'Échec de la mise à jour du profil',
   'settings.yourFullName': 'Votre nom complet',
-  
+
   // Palm Upload - French
   'palm.uploadTitle': 'Téléchargez vos Images de Paumes',
   'palm.uploadDesc': 'Téléchargez des photos claires de vos paumes. Nous avons besoin d\'au moins la vue de face des deux paumes.',
@@ -239,12 +239,12 @@ export default {
   'palm.unexpectedResponse': 'Format de réponse inattendu',
   'palm.cameraNotAvailable': 'L\'accès à la caméra n\'est pas disponible dans votre navigateur. Veuillez utiliser l\'option de téléchargement de fichier.',
   'palm.httpsRequired': 'L\'accès à la caméra nécessite HTTPS. Veuillez utiliser le téléchargement de fichier ou accéder au site via HTTPS.',
-  
+
   // Chat/Ask Question - French
   'chat.askYourQuestion': 'Posez votre Question',
   'chat.submitQuestionDesc': 'Soumettez votre question et recevez une réponse personnalisée par e-mail',
   'chat.dashboard': 'Tableau de Bord',
-  
+
   // Subscription Plans - French
   'plan.basic': 'Basique',
   'plan.basicDesc': 'Parfait pour commencer avec les perspectives astrologiques',

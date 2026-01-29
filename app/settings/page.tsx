@@ -90,7 +90,7 @@ export default function SettingsPage() {
         // Format time_of_birth from "HH:MM:SS" to "HH:MM" for TimePicker
         const timeOfBirth = profileResult.data.profile.time_of_birth || ''
         const formattedTime = timeOfBirth.includes(':') ? timeOfBirth.substring(0, 5) : timeOfBirth
-        
+
         setFormData(prev => ({
           ...prev,
           date_of_birth: profileResult.data.profile.date_of_birth || '',
@@ -161,9 +161,7 @@ export default function SettingsPage() {
             <p className="text-text-secondary text-sm sm:text-base">{t('settings.manageProfile')}</p>
           </div>
           <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-            <div className="hidden sm:block">
-              <LanguageSwitcher />
-            </div>
+            <LanguageSwitcher />
             <Link
               href="/dashboard"
               className="px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 bg-white border-2 border-beige-300 hover:border-gold-400 text-text-primary rounded-lg sm:rounded-xl font-semibold transition-all shadow-soft hover:shadow-soft-lg flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm"

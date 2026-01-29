@@ -25,7 +25,7 @@ export default {
   'common.unlimitedQuestionsPerDay': 'प्रतिदिन असीमित प्रश्न',
   'common.pleaseReUpload': 'कृपया दोनों हथेलियों को फिर से अपलोड या कैप्चर करें',
   'common.loading': 'लोड हो रहा है...',
-  
+
   // Dashboard
   'dashboard.title': 'व्हिस्परिंग पाम्स',
   'dashboard.completeProfile': 'प्रोफ़ाइल पूर्ण करें',
@@ -45,7 +45,7 @@ export default {
   'dashboard.reUpload': 'फिर से अपलोड करें',
   'dashboard.uploadYourPalms': 'अपनी हथेलियां अपलोड करें',
   'dashboard.uploadBothPalms': 'सत्यापित करने के लिए दाएं और बाएं दोनों हथेली की छवियां अपलोड करें',
-  
+
   // Chat/Questions
   'chat.title': 'एक प्रश्न पूछें',
   'chat.placeholder': 'अपना प्रश्न यहाँ टाइप करें...',
@@ -55,7 +55,7 @@ export default {
   'chat.sent': 'भेजा गया',
   'chat.checkEmail': 'अपना ईमेल जांचें',
   'chat.noQuestions': 'अभी तक कोई प्रश्न नहीं',
-  
+
   // Subscription
   'subscription.title': 'अपनी योजना चुनें',
   'subscription.backToDashboard': 'डैशबोर्ड पर वापस जाएं',
@@ -84,13 +84,13 @@ export default {
   'subscription.mostPopular': 'सबसे लोकप्रिय',
   'subscription.questionsPerDay': 'प्रश्न प्रति दिन',
   'subscription.deliveryTime': 'वितरण समय',
-  
+
   // Settings
   'settings.title': 'सेटिंग्स',
   'settings.profile': 'प्रोफ़ाइल',
   'settings.save': 'सहेजें',
   'settings.cancel': 'रद्द करें',
-  
+
   // Auth
   'auth.login': 'लॉगिन',
   'auth.register': 'पंजीकरण',
@@ -123,7 +123,7 @@ export default {
   'auth.loginFailed': 'लॉगिन विफल',
   'auth.registrationFailed': 'पंजीकरण विफल',
   'auth.registrationSuccess': 'पंजीकरण सफल!',
-  
+
   // Home page
   'home.tagline': 'प्राचीन भारतीय ज्ञान आधुनिक प्रौद्योगिकी से मिलता है',
   'home.description': 'हस्तरेखा और ज्योतिष के माध्यम से अपनी नियति की खोज करें। हमारे विशेषज्ञ ज्योतिषी से व्यक्तिगत अंतर्दृष्टि प्राप्त करें, सदियों के वैदिक ज्ञान को आधुनिक विश्लेषण के साथ जोड़ते हुए।',
@@ -133,14 +133,14 @@ export default {
   'home.palmReading': 'हस्तरेखा',
   'home.palmReadingDesc': 'आपकी हथेली की छवियों से विशेषज्ञ हस्तरेखा विश्लेषण',
   'home.expertGuidance': 'विशेषज्ञ मार्गदर्शन',
-  'home.expertGuidanceDesc': 'व्यक्तिगत मार्गदर्शन के लिए हमारे विशेषज्ञ ज्योतिषी से चैट करें',
+  'home.expertGuidanceDesc': 'प्रश्न पूछें और व्यक्तिगत ईमेल के माध्यम से विस्तृत उत्तर प्राप्त करें',
   'home.expertAstrologer': 'विशेषज्ञ ज्योतिषी',
   'home.vedicWisdom': 'वैदिक ज्ञान',
   'home.securePrivate': 'सुरक्षित और निजी',
   'home.termsConditions': 'नियम और शर्तें',
   'home.privacyPolicy': 'गोपनीयता नीति',
   'home.copyright': 'सभी अधिकार सुरक्षित',
-  
+
   // Onboarding
   'onboarding.welcome': 'व्हिस्परिंग पाम्स में आपका स्वागत है',
   'onboarding.welcomeDesc': 'आइए अपनी बुनियादी जानकारी सेट करके शुरू करें',
@@ -168,7 +168,7 @@ export default {
   'onboarding.saving': 'सहेजा जा रहा है...',
   'onboarding.enterFullName': 'अपना पूरा नाम दर्ज करें',
   'onboarding.failedToSave': 'प्रोफ़ाइल सहेजने में विफल',
-  
+
   // Settings
   'settings.manageProfile': 'अपनी प्रोफ़ाइल और प्राथमिकताएं प्रबंधित करें',
   'settings.backToDashboard': 'डैशबोर्ड पर वापस जाएं',
@@ -183,7 +183,7 @@ export default {
   'settings.profileUpdated': 'प्रोफ़ाइल सफलतापूर्वक अपडेट की गई!',
   'settings.profileUpdateFailed': 'प्रोफ़ाइल अपडेट करने में विफल',
   'settings.yourFullName': 'आपका पूरा नाम',
-  
+
   // Palm Upload
   'palm.uploadTitle': 'अपनी हथेली की छवियां अपलोड करें',
   'palm.uploadDesc': 'अपनी हथेलियों की स्पष्ट तस्वीरें अपलोड करें। हमें कम से कम दोनों हथेलियों का सामने का दृश्य चाहिए।',
@@ -239,12 +239,12 @@ export default {
   'palm.unexpectedResponse': 'अप्रत्याशित प्रतिक्रिया प्रारूप',
   'palm.cameraNotAvailable': 'आपके ब्राउज़र में कैमरा एक्सेस उपलब्ध नहीं है। कृपया फ़ाइल अपलोड विकल्प का उपयोग करें।',
   'palm.httpsRequired': 'कैमरा एक्सेस के लिए HTTPS की आवश्यकता है। कृपया फ़ाइल अपलोड का उपयोग करें या HTTPS के माध्यम से साइट तक पहुंचें।',
-  
+
   // Chat/Ask Question
   'chat.askYourQuestion': 'अपना प्रश्न पूछें',
   'chat.submitQuestionDesc': 'अपना प्रश्न सबमिट करें और ईमेल के माध्यम से व्यक्तिगत उत्तर प्राप्त करें',
   'chat.dashboard': 'डैशबोर्ड',
-  
+
   // Subscription Plans
   'plan.basic': 'बेसिक',
   'plan.basicDesc': 'ज्योतिष अंतर्दृष्टि के साथ शुरुआत करने के लिए आदर्श',

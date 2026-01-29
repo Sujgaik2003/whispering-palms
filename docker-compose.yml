@@ -1,0 +1,52 @@
+services:
+  # Next.js Application
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: whispering-palms-web
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.local
+    environment:
+      - NODE_ENV=production
+      - ANYTHINGLLM_API_URL=http://anythingllm:3001
+    depends_on:
+      - anythingllm
+
+  # AnythingLLM for RAG and AI Orchestration
+  anythingllm:
+    image: mintplexlabs/anythingllm:latest
+    container_name: anythingllm
+    restart: always
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./anythingllm/storage:/app/server/storage
+    environment:
+      - STORAGE_DIR=/app/server/storage
+      - VECTOR_DB=qdrant
+      - QDRANT_URL=http://qdrant:6333
+    depends_on:
+      - qdrant
+    networks:
+      - app-network
+
+  # Qdrant Vector Database
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrant
+    restart: always
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - ./anythingllm/qdrant_storage:/qdrant/storage
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

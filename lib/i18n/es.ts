@@ -25,7 +25,7 @@ export default {
   'common.unlimitedQuestionsPerDay': 'Preguntas ilimitadas por día',
   'common.pleaseReUpload': 'Por favor, vuelva a subir o capturar ambas palmas',
   'common.loading': 'Cargando...',
-  
+
   // Dashboard
   'dashboard.title': 'Palmas Susurrantes',
   'dashboard.completeProfile': 'Completar perfil',
@@ -45,7 +45,7 @@ export default {
   'dashboard.reUpload': 'Volver a subir',
   'dashboard.uploadYourPalms': 'Sube tus palmas',
   'dashboard.uploadBothPalms': 'Sube imágenes de ambas palmas derecha e izquierda para verificar que coinciden',
-  
+
   // Chat/Questions
   'chat.title': 'Hacer una pregunta',
   'chat.placeholder': 'Escribe tu pregunta aquí...',
@@ -55,7 +55,7 @@ export default {
   'chat.sent': 'Enviado',
   'chat.checkEmail': 'Revisa tu correo electrónico',
   'chat.noQuestions': 'Aún no hay preguntas',
-  
+
   // Subscription
   'subscription.title': 'Elige tu plan',
   'subscription.backToDashboard': 'Volver al panel',
@@ -84,13 +84,13 @@ export default {
   'subscription.mostPopular': 'Más Popular',
   'subscription.questionsPerDay': 'Preguntas por día',
   'subscription.deliveryTime': 'Tiempo de entrega',
-  
+
   // Settings
   'settings.title': 'Configuración',
   'settings.profile': 'Perfil',
   'settings.save': 'Guardar',
   'settings.cancel': 'Cancelar',
-  
+
   // Auth
   'auth.login': 'Iniciar sesión',
   'auth.register': 'Registrarse',
@@ -123,7 +123,7 @@ export default {
   'auth.loginFailed': 'Error al iniciar sesión',
   'auth.registrationFailed': 'Error en el registro',
   'auth.registrationSuccess': '¡Registro exitoso!',
-  
+
   // Home page
   'home.tagline': 'La sabiduría india antigua se encuentra con la tecnología moderna',
   'home.description': 'Descubre tu destino a través de la quiromancia y la astrología. Obtén información personalizada de nuestro astrólogo experto, combinando siglos de conocimiento védico con análisis moderno.',
@@ -133,14 +133,14 @@ export default {
   'home.palmReading': 'Lectura de palmas',
   'home.palmReadingDesc': 'Análisis experto de quiromancia a partir de tus imágenes de palmas',
   'home.expertGuidance': 'Orientación experta',
-  'home.expertGuidanceDesc': 'Chatea con nuestro astrólogo experto para orientación personalizada',
+  'home.expertGuidanceDesc': 'Haga preguntas y obtenga respuestas detalladas por correo electrónico personalizado',
   'home.expertAstrologer': 'Astrólogo experto',
   'home.vedicWisdom': 'Sabiduría védica',
   'home.securePrivate': 'Seguro y Privado',
   'home.termsConditions': 'Términos y Condiciones',
   'home.privacyPolicy': 'Política de Privacidad',
   'home.copyright': 'Todos los derechos reservados',
-  
+
   // Onboarding - Spanish translations
   'onboarding.welcome': 'Bienvenido a Palmas Susurrantes',
   'onboarding.welcomeDesc': 'Comencemos configurando tu información básica',
@@ -168,7 +168,7 @@ export default {
   'onboarding.saving': 'Guardando...',
   'onboarding.enterFullName': 'Ingresa tu nombre completo',
   'onboarding.failedToSave': 'Error al guardar el perfil',
-  
+
   // Settings - Spanish
   'settings.manageProfile': 'Gestiona tu perfil y preferencias',
   'settings.backToDashboard': 'Volver al Panel',
@@ -183,7 +183,7 @@ export default {
   'settings.profileUpdated': '¡Perfil actualizado exitosamente!',
   'settings.profileUpdateFailed': 'Error al actualizar el perfil',
   'settings.yourFullName': 'Tu nombre completo',
-  
+
   // Palm Upload - Spanish
   'palm.uploadTitle': 'Sube tus Imágenes de Palmas',
   'palm.uploadDesc': 'Sube fotos claras de tus palmas. Necesitamos al menos la vista frontal de ambas palmas.',
@@ -239,12 +239,12 @@ export default {
   'palm.unexpectedResponse': 'Formato de respuesta inesperado',
   'palm.cameraNotAvailable': 'El acceso a la cámara no está disponible en tu navegador. Por favor usa la opción de subida de archivos.',
   'palm.httpsRequired': 'El acceso a la cámara requiere HTTPS. Por favor usa la subida de archivos o accede al sitio vía HTTPS.',
-  
+
   // Chat/Ask Question - Spanish
   'chat.askYourQuestion': 'Haz tu Pregunta',
   'chat.submitQuestionDesc': 'Envía tu pregunta y recibe una respuesta personalizada por correo electrónico',
   'chat.dashboard': 'Panel',
-  
+
   // Subscription Plans - Spanish
   'plan.basic': 'Básico',
   'plan.basicDesc': 'Perfecto para comenzar con perspectivas astrológicas',

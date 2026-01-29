@@ -25,7 +25,7 @@ export default {
   'common.unlimitedQuestionsPerDay': 'Unlimited questions per day',
   'common.pleaseReUpload': 'Please re-upload or re-capture both palms',
   'common.loading': 'Loading...',
-  
+
   // Dashboard
   'dashboard.title': 'Whispering Palms',
   'dashboard.completeProfile': 'Complete Profile',
@@ -45,7 +45,7 @@ export default {
   'dashboard.reUpload': 'Re-upload',
   'dashboard.uploadYourPalms': 'Upload Your Palms',
   'dashboard.uploadBothPalms': 'Upload both right and left palm images to verify they match',
-  
+
   // Chat/Questions
   'chat.title': 'Ask a Question',
   'chat.placeholder': 'Type your question here...',
@@ -55,7 +55,7 @@ export default {
   'chat.sent': 'Sent',
   'chat.checkEmail': 'Check your email',
   'chat.noQuestions': 'No questions yet',
-  
+
   // Subscription
   'subscription.title': 'Choose Your Plan',
   'subscription.backToDashboard': 'Back to Dashboard',
@@ -84,13 +84,13 @@ export default {
   'subscription.mostPopular': 'Most Popular',
   'subscription.questionsPerDay': 'Questions per day',
   'subscription.deliveryTime': 'Delivery time',
-  
+
   // Settings
   'settings.title': 'Settings',
   'settings.profile': 'Profile',
   'settings.save': 'Save',
   'settings.cancel': 'Cancel',
-  
+
   // Auth
   'auth.login': 'Login',
   'auth.register': 'Register',
@@ -123,7 +123,7 @@ export default {
   'auth.loginFailed': 'Login failed',
   'auth.registrationFailed': 'Registration failed',
   'auth.registrationSuccess': 'Registration successful!',
-  
+
   // Home page
   'home.tagline': 'Ancient Indian Wisdom Meets Modern Technology',
   'home.description': 'Discover your destiny through palmistry and astrology. Get personalized insights from our expert astrologer, combining centuries of Vedic knowledge with modern analysis.',
@@ -133,14 +133,14 @@ export default {
   'home.palmReading': 'Palm Reading',
   'home.palmReadingDesc': 'Expert palmistry analysis from your palm images',
   'home.expertGuidance': 'Expert Guidance',
-  'home.expertGuidanceDesc': 'Chat with our expert astrologer for personalized guidance',
+  'home.expertGuidanceDesc': 'Ask questions and get detailed answers via personalized email',
   'home.expertAstrologer': 'Expert Astrologer',
   'home.vedicWisdom': 'Vedic Wisdom',
   'home.securePrivate': 'Secure & Private',
   'home.termsConditions': 'Terms & Conditions',
   'home.privacyPolicy': 'Privacy Policy',
   'home.copyright': 'All rights reserved',
-  
+
   // Onboarding
   'onboarding.welcome': 'Welcome to Whispering Palms',
   'onboarding.welcomeDesc': 'Let\'s start by setting up your basic information',
@@ -168,7 +168,7 @@ export default {
   'onboarding.saving': 'Saving...',
   'onboarding.enterFullName': 'Enter your full name',
   'onboarding.failedToSave': 'Failed to save profile',
-  
+
   // Settings
   'settings.manageProfile': 'Manage your profile and preferences',
   'settings.backToDashboard': 'Back to Dashboard',
@@ -183,7 +183,7 @@ export default {
   'settings.profileUpdated': 'Profile updated successfully!',
   'settings.profileUpdateFailed': 'Failed to update profile',
   'settings.yourFullName': 'Your full name',
-  
+
   // Palm Upload
   'palm.uploadTitle': 'Upload Your Palm Images',
   'palm.uploadDesc': 'Upload clear photos of your palms. We need at least the front view of both palms.',
@@ -241,7 +241,7 @@ export default {
   'palm.unexpectedResponse': 'Unexpected response format',
   'palm.cameraNotAvailable': 'Camera access is not available in your browser. Please use the file upload option instead.',
   'palm.httpsRequired': 'Camera access requires HTTPS. Please use file upload or access the site via HTTPS.',
-  
+
   // Chat/Ask Question
   'chat.askYourQuestion': 'Ask Your Question',
   'chat.submitQuestionDesc': 'Submit your question and receive a personalized answer via email',
@@ -249,7 +249,7 @@ export default {
   'chat.typeYourQuestion': 'Type your question here...',
   'chat.answerDeliveryNote': 'Your answer will be delivered via email based on your subscription plan.',
   'chat.submit': 'Submit',
-  
+
   // Subscription Plans
   'plan.basic': 'Basic',
   'plan.basicDesc': 'Perfect for getting started with astrology insights',

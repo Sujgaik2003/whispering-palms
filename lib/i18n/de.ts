@@ -25,7 +25,7 @@ export default {
   'common.unlimitedQuestionsPerDay': 'Unbegrenzte Fragen pro Tag',
   'common.pleaseReUpload': 'Bitte laden Sie beide Handflächen erneut hoch oder erfassen Sie sie erneut',
   'common.loading': 'Lädt...',
-  
+
   // Dashboard
   'dashboard.title': 'Flüsternde Palmen',
   'dashboard.completeProfile': 'Profil vervollständigen',
@@ -45,7 +45,7 @@ export default {
   'dashboard.reUpload': 'Erneut hochladen',
   'dashboard.uploadYourPalms': 'Laden Sie Ihre Handflächen hoch',
   'dashboard.uploadBothPalms': 'Laden Sie Bilder der rechten und linken Handfläche hoch, um zu überprüfen, ob sie übereinstimmen',
-  
+
   // Chat/Questions
   'chat.title': 'Eine Frage stellen',
   'chat.placeholder': 'Geben Sie hier Ihre Frage ein...',
@@ -55,7 +55,7 @@ export default {
   'chat.sent': 'Gesendet',
   'chat.checkEmail': 'Überprüfen Sie Ihre E-Mail',
   'chat.noQuestions': 'Noch keine Fragen',
-  
+
   // Subscription
   'subscription.title': 'Wählen Sie Ihren Plan',
   'subscription.backToDashboard': 'Zurück zum Dashboard',
@@ -84,13 +84,13 @@ export default {
   'subscription.mostPopular': 'Am Beliebtesten',
   'subscription.questionsPerDay': 'Fragen pro Tag',
   'subscription.deliveryTime': 'Lieferzeit',
-  
+
   // Settings
   'settings.title': 'Einstellungen',
   'settings.profile': 'Profil',
   'settings.save': 'Speichern',
   'settings.cancel': 'Abbrechen',
-  
+
   // Auth
   'auth.login': 'Anmelden',
   'auth.register': 'Registrieren',
@@ -123,7 +123,7 @@ export default {
   'auth.loginFailed': 'Anmeldung fehlgeschlagen',
   'auth.registrationFailed': 'Registrierung fehlgeschlagen',
   'auth.registrationSuccess': 'Registrierung erfolgreich!',
-  
+
   // Home page
   'home.tagline': 'Alte indische Weisheit trifft auf moderne Technologie',
   'home.description': 'Entdecken Sie Ihr Schicksal durch Handlesen und Astrologie. Erhalten Sie personalisierte Einblicke von unserem Experten-Astrologen und kombinieren Sie jahrhundertealtes vedisches Wissen mit moderner Analyse.',
@@ -133,14 +133,14 @@ export default {
   'home.palmReading': 'Handlesen',
   'home.palmReadingDesc': 'Experten-Handlesen-Analyse aus Ihren Handflächenbildern',
   'home.expertGuidance': 'Expertenberatung',
-  'home.expertGuidanceDesc': 'Chatten Sie mit unserem Experten-Astrologen für personalisierte Beratung',
+  'home.expertGuidanceDesc': 'Stellen Sie Fragen und erhalten Sie detaillierte Antworten per personalisierter E-Mail',
   'home.expertAstrologer': 'Experten-Astrologe',
   'home.vedicWisdom': 'Vedische Weisheit',
   'home.securePrivate': 'Sicher und Privat',
   'home.termsConditions': 'Allgemeine Geschäftsbedingungen',
   'home.privacyPolicy': 'Datenschutzrichtlinie',
   'home.copyright': 'Alle Rechte vorbehalten',
-  
+
   // Onboarding - German
   'onboarding.welcome': 'Willkommen bei Flüsternde Palmen',
   'onboarding.welcomeDesc': 'Beginnen wir mit der Einrichtung Ihrer Grundinformationen',
@@ -168,7 +168,7 @@ export default {
   'onboarding.saving': 'Speichern...',
   'onboarding.enterFullName': 'Geben Sie Ihren vollständigen Namen ein',
   'onboarding.failedToSave': 'Profil konnte nicht gespeichert werden',
-  
+
   // Settings - German
   'settings.manageProfile': 'Verwalten Sie Ihr Profil und Ihre Einstellungen',
   'settings.backToDashboard': 'Zurück zum Dashboard',
@@ -183,7 +183,7 @@ export default {
   'settings.profileUpdated': 'Profil erfolgreich aktualisiert!',
   'settings.profileUpdateFailed': 'Profil konnte nicht aktualisiert werden',
   'settings.yourFullName': 'Ihr vollständiger Name',
-  
+
   // Palm Upload - German
   'palm.uploadTitle': 'Laden Sie Ihre Handflächenbilder Hoch',
   'palm.uploadDesc': 'Laden Sie klare Fotos Ihrer Handflächen hoch. Wir benötigen mindestens die Vorderansicht beider Handflächen.',
@@ -239,12 +239,12 @@ export default {
   'palm.unexpectedResponse': 'Unerwartetes Antwortformat',
   'palm.cameraNotAvailable': 'Kamerazugriff ist in Ihrem Browser nicht verfügbar. Bitte verwenden Sie die Datei-Upload-Option.',
   'palm.httpsRequired': 'Kamerazugriff erfordert HTTPS. Bitte verwenden Sie den Datei-Upload oder greifen Sie über HTTPS auf die Site zu.',
-  
+
   // Chat/Ask Question - German
   'chat.askYourQuestion': 'Stellen Sie Ihre Frage',
   'chat.submitQuestionDesc': 'Senden Sie Ihre Frage und erhalten Sie eine personalisierte Antwort per E-Mail',
   'chat.dashboard': 'Dashboard',
-  
+
   // Subscription Plans - German
   'plan.basic': 'Basis',
   'plan.basicDesc': 'Perfekt für den Einstieg in astrologische Einblicke',

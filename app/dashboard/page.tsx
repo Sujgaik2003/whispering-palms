@@ -43,7 +43,7 @@ export default function DashboardPage() {
     })
     setMounted(true)
   }, [language, renderKey])
-  
+
   // Listen for translation ready events
   useEffect(() => {
     const handleTranslationReady = (event?: any) => {
@@ -56,7 +56,7 @@ export default function DashboardPage() {
       })
       setMounted(prev => !prev)
     }
-    
+
     const handleForceUpdate = () => {
       console.log(`[Dashboard] 🔔 i18n:forceUpdate event received`)
       setForceRender(prev => {
@@ -65,7 +65,7 @@ export default function DashboardPage() {
         return newCount
       })
     }
-    
+
     const handleLanguageChanged = (event?: any) => {
       console.log(`[Dashboard] 🔔 i18n:languageChanged event received`, event?.detail)
       setForceRender(prev => {
@@ -74,13 +74,13 @@ export default function DashboardPage() {
         return newCount
       })
     }
-    
+
     if (typeof window !== 'undefined') {
       console.log(`[Dashboard] 👂 Registering event listeners`)
       window.addEventListener('i18n:translationReady', handleTranslationReady)
       window.addEventListener('i18n:forceUpdate', handleForceUpdate)
       window.addEventListener('i18n:languageChanged', handleLanguageChanged)
-      
+
       return () => {
         console.log(`[Dashboard] 🧹 Cleaning up event listeners`)
         window.removeEventListener('i18n:translationReady', handleTranslationReady)
@@ -164,7 +164,7 @@ export default function DashboardPage() {
       const palmImages = palmResult.data?.palmImages || []
       let completedFields = 0
       const totalFields = 7 // name, country, date_of_birth, time_of_birth, place_of_birth, birth_timezone, palm images
-      
+
       if (user?.name) completedFields++
       if (user?.country) completedFields++
       if (profile?.date_of_birth) completedFields++
@@ -172,7 +172,7 @@ export default function DashboardPage() {
       if (profile?.place_of_birth) completedFields++
       if (profile?.birth_timezone) completedFields++
       if (palmImages.length > 0) completedFields++
-      
+
       setProfileCompletion(Math.round((completedFields / totalFields) * 100))
     } catch (error) {
       router.push('/login')
@@ -231,9 +231,7 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-              <div className="hidden sm:block">
-                <LanguageSwitcher />
-              </div>
+              <LanguageSwitcher />
               <Link
                 href="/settings"
                 className="px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 bg-white border-2 border-beige-300 hover:border-gold-400 text-text-primary rounded-lg sm:rounded-xl font-semibold transition-all shadow-soft hover:shadow-soft-lg flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm"
@@ -267,12 +265,12 @@ export default function DashboardPage() {
             >
               {/* Glow effect on hover */}
               <div className="absolute -inset-1 bg-gradient-to-r from-peach-400 to-peach-600 rounded-3xl opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-700"></div>
-              
+
               {/* Shimmer overlay */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
                 <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
               </div>
-              
+
               {/* Content */}
               <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-4 sm:gap-6 flex-1 min-w-0">
@@ -303,12 +301,12 @@ export default function DashboardPage() {
             >
               {/* Glow effect on hover */}
               <div className="absolute -inset-1 bg-gradient-to-r from-sage-400 to-sage-600 rounded-3xl opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-700"></div>
-              
+
               {/* Shimmer overlay */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
                 <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
               </div>
-              
+
               {/* Content */}
               <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-4 sm:gap-6 flex-1 min-w-0">
@@ -339,12 +337,12 @@ export default function DashboardPage() {
             >
               {/* Glow effect on hover */}
               <div className="absolute -inset-1 bg-gradient-to-r from-gold-400 to-gold-600 rounded-3xl opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-700"></div>
-              
+
               {/* Shimmer overlay */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
                 <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
               </div>
-              
+
               {/* Content */}
               <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-4 sm:gap-6 flex-1 min-w-0">
@@ -375,12 +373,12 @@ export default function DashboardPage() {
             >
               {/* Glow effect on hover */}
               <div className="absolute -inset-1 bg-gradient-to-r from-purple-400 to-purple-600 rounded-3xl opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-700"></div>
-              
+
               {/* Shimmer overlay */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
                 <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
               </div>
-              
+
               {/* Content */}
               <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-4 sm:gap-6 flex-1 min-w-0">
@@ -412,7 +410,7 @@ export default function DashboardPage() {
               <div className={`group relative min-h-[160px] sm:min-h-[180px] bg-gradient-to-br from-gold-100 via-peach-100 to-gold-100 rounded-2xl sm:rounded-3xl p-6 sm:p-8 border-2 border-gold-300 hover:border-gold-500 shadow-soft-xl hover:shadow-[0_25px_70px_rgba(230,194,89,0.3)] transition-all duration-700 delay-500 hover:-translate-y-2 hover:scale-[1.02] overflow-hidden ${mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'}`}>
                 {/* Glow effect */}
                 <div className="absolute -inset-1 bg-gradient-to-r from-gold-400 to-peach-400 rounded-3xl opacity-0 group-hover:opacity-15 blur-2xl transition-opacity duration-700"></div>
-                
+
                 <div className="relative z-10 flex flex-col">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 gap-4">
                     <div className="flex items-center gap-3 sm:gap-5">
@@ -469,7 +467,7 @@ export default function DashboardPage() {
                                 ? 'bg-yellow-600'
                                 : 'bg-green-600'
                               }`}
-                            style={{ 
+                            style={{
                               width: `${Math.min(quota.percentage, 100)}%`,
                             }}
                           />

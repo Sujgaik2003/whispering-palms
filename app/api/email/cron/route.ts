@@ -13,14 +13,17 @@ import { generateAnswerEmail } from '@/lib/services/email'
 import { Resend } from 'resend'
 import nodemailer from 'nodemailer'
 
-type EmailProvider = 'resend' | 'gmail'
+type EmailProvider = 'resend' | 'zoho' | 'gmail'
 
 function getEmailProvider(): EmailProvider {
   const provider = process.env.EMAIL_PROVIDER?.toLowerCase()
   if (provider === 'gmail' || provider === 'smtp') {
     return 'gmail'
   }
-  return 'resend'
+  if (provider === 'zoho' || provider === 'zohomail') {
+    return 'zoho'
+  }
+  return 'zoho' // Default to Zoho for professional emails
 }
 
 function getResendClient() {
@@ -31,14 +34,33 @@ function getResendClient() {
   return new Resend(apiKey)
 }
 
+function getZohoTransporter() {
+  const zohoUser = process.env.ZOHO_MAIL_USER
+  const zohoPassword = process.env.ZOHO_MAIL_PASSWORD
+
+  if (!zohoUser || !zohoPassword) {
+    throw new Error('Zoho Mail SMTP not configured')
+  }
+
+  return nodemailer.createTransport({
+    host: 'smtp.zoho.com',
+    port: 465,
+    secure: true,
+    auth: {
+      user: zohoUser,
+      pass: zohoPassword,
+    },
+  })
+}
+
 function getGmailTransporter() {
   const gmailUser = process.env.GMAIL_USER
   const gmailAppPassword = process.env.GMAIL_APP_PASSWORD
-  
+
   if (!gmailUser || !gmailAppPassword) {
     throw new Error('Gmail SMTP not configured')
   }
-  
+
   return nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -50,8 +72,16 @@ function getGmailTransporter() {
 
 async function sendEmail(to: string, subject: string, html: string): Promise<void> {
   const provider = getEmailProvider()
-  
-  if (provider === 'gmail') {
+
+  if (provider === 'zoho') {
+    const transporter = getZohoTransporter()
+    await transporter.sendMail({
+      from: `"Whispering Palms" <${process.env.ZOHO_MAIL_USER}>`,
+      to,
+      subject,
+      html,
+    })
+  } else if (provider === 'gmail') {
     const transporter = getGmailTransporter()
     await transporter.sendMail({
       from: `"Whispering Palms" <${process.env.GMAIL_USER}>`,
@@ -121,12 +151,12 @@ export async function GET(request: NextRequest) {
       const isTestMode = process.env.EMAIL_TEST_MODE === 'true'
       const emailProvider = getEmailProvider()
       const planType = emailMetadata.plan_type || 'basic'
-      
+
       // Calculate time until delivery
       const timeUntilDelivery = deliveryTime.getTime() - now.getTime()
       const minutesUntilDelivery = Math.round(timeUntilDelivery / (1000 * 60))
       const secondsUntilDelivery = Math.round(timeUntilDelivery / 1000)
-      
+
       // Debug logging
       console.log(`\n🔍 [CRON] Checking email for ${planType} plan (answer ${answer.id}):`)
       console.log(`   Scheduled delivery time: ${deliveryTime.toISOString()}`)
@@ -135,11 +165,11 @@ export async function GET(request: NextRequest) {
       console.log(`   Test mode:              ${isTestMode}`)
       console.log(`   Email provider:         ${emailProvider}`)
       console.log(`   Is due?                 ${now >= deliveryTime ? 'YES ✅' : 'NO ⏳'}`)
-      
+
       // Check if email should be sent now
       // IMPORTANT: Only send if delivery time has passed (unless test mode)
       // Gmail provider ab bhi delays respect karega
-      const shouldSend = 
+      const shouldSend =
         isTestMode || // Test mode sends immediately
         now >= deliveryTime // Production: send ONLY if delivery time has passed
 
@@ -154,7 +184,7 @@ export async function GET(request: NextRequest) {
         }
         continue // Skip emails that aren't due yet
       }
-      
+
       // Log why email is being sent
       let sendReason = ''
       if (isTestMode) {
@@ -162,7 +192,7 @@ export async function GET(request: NextRequest) {
       } else {
         sendReason = 'Delivery time reached'
       }
-      
+
       console.log(`📧 [SEND] Sending email for ${planType} plan (answer ${answer.id})`)
       console.log(`   Reason: ${sendReason}`)
       console.log(`   Scheduled for: ${deliveryTime.toISOString()}`)

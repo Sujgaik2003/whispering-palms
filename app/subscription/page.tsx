@@ -166,10 +166,10 @@ export default function SubscriptionPage() {
   const { t, language, renderKey } = useI18n() // i18n hook for translations - renderKey forces re-render
   const [mounted, setMounted] = useState(false)
   const [forceRender, setForceRender] = useState(0) // Force re-render counter
-  
+
   // Get plans with translations
   const plans = getPlans(t)
-  
+
   // Force re-render when language changes
   useEffect(() => {
     console.log(`[Subscription] 🔄 Language or renderKey changed - language: ${language}, renderKey: ${renderKey}`)
@@ -180,7 +180,7 @@ export default function SubscriptionPage() {
       return newCount
     })
   }, [language, renderKey])
-  
+
   // Listen for translation ready events
   useEffect(() => {
     const handleTranslationReady = (event?: any) => {
@@ -192,7 +192,7 @@ export default function SubscriptionPage() {
         return newCount
       })
     }
-    
+
     const handleForceUpdate = () => {
       console.log(`[Subscription] 🔔 i18n:forceUpdate event received`)
       setForceRender(prev => {
@@ -201,7 +201,7 @@ export default function SubscriptionPage() {
         return newCount
       })
     }
-    
+
     const handleLanguageChanged = (event?: any) => {
       console.log(`[Subscription] 🔔 i18n:languageChanged event received`, event?.detail)
       setForceRender(prev => {
@@ -210,13 +210,13 @@ export default function SubscriptionPage() {
         return newCount
       })
     }
-    
+
     if (typeof window !== 'undefined') {
       console.log(`[Subscription] 👂 Registering event listeners`)
       window.addEventListener('i18n:translationReady', handleTranslationReady)
       window.addEventListener('i18n:forceUpdate', handleForceUpdate)
       window.addEventListener('i18n:languageChanged', handleLanguageChanged)
-      
+
       return () => {
         console.log(`[Subscription] 🧹 Cleaning up event listeners`)
         window.removeEventListener('i18n:translationReady', handleTranslationReady)
@@ -225,7 +225,7 @@ export default function SubscriptionPage() {
       }
     }
   }, [])
-  
+
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly')
   const [hoveredPlan, setHoveredPlan] = useState<string | null>(null)
   const [currentPlan, setCurrentPlan] = useState<'basic' | 'spark' | 'flame' | 'superflame' | null>(null)
@@ -367,35 +367,37 @@ export default function SubscriptionPage() {
           </p>
 
           {/* Billing Toggle */}
-          <div className="inline-flex items-center gap-2 sm:gap-4 bg-white/80 backdrop-blur-sm rounded-full p-1.5 sm:p-2 border-2 border-beige-300 shadow-soft">
-            <button
-              onClick={() => setBillingCycle('monthly')}
-              className={`px-4 sm:px-6 py-1.5 sm:py-2 rounded-full font-semibold transition-all text-xs sm:text-sm md:text-base ${
-                billingCycle === 'monthly'
-                  ? 'bg-gradient-to-r from-gold-500 to-gold-600 text-white shadow-soft'
+          <div className="flex justify-center mt-4 sm:mt-6 mb-4 sm:mb-6">
+            <div className="inline-flex items-center gap-1 sm:gap-2 bg-white/40 backdrop-blur-xl rounded-2xl p-1.5 sm:p-2 border border-white/60 shadow-soft-xl max-w-full">
+              <button
+                onClick={() => setBillingCycle('monthly')}
+                className={`relative z-10 px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl font-bold transition-all text-sm sm:text-base ${billingCycle === 'monthly'
+                  ? 'bg-gold-500 text-white shadow-soft-lg scale-105'
                   : 'text-text-secondary hover:text-text-primary'
-              }`}
-            >
-              {t('subscription.monthly')}
-            </button>
-            <button
-              onClick={() => setBillingCycle('yearly')}
-              className={`px-4 sm:px-6 py-1.5 sm:py-2 rounded-full font-semibold transition-all relative text-xs sm:text-sm md:text-base ${
-                billingCycle === 'yearly'
-                  ? 'bg-gradient-to-r from-gold-500 to-gold-600 text-white shadow-soft'
+                  }`}
+              >
+                {t('subscription.monthly')}
+              </button>
+              <button
+                onClick={() => setBillingCycle('yearly')}
+                className={`relative z-10 px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl font-bold transition-all text-sm sm:text-base ${billingCycle === 'yearly'
+                  ? 'bg-gold-500 text-white shadow-soft-lg scale-105'
                   : 'text-text-secondary hover:text-text-primary'
-              }`}
-            >
-              {t('subscription.yearly')}
-              <span className="absolute -top-1.5 -right-1.5 sm:-top-2 sm:-right-2 bg-red-500 text-white text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full whitespace-nowrap">
-                {t('subscription.savePercent')} 20%
-              </span>
-            </button>
+                  }`}
+              >
+                <span className="flex items-center gap-2">
+                  {t('subscription.yearly')}
+                  <span className="inline-flex bg-red-500 text-white text-[10px] sm:text-xs px-2 py-0.5 rounded-full font-black animate-pulse uppercase">
+                    {t('subscription.savePercent')} 20%
+                  </span>
+                </span>
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Plans Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 md:gap-10 mb-12 sm:mb-20">
           {plans.map((plan, index) => {
             const colors = colorClasses[plan.color]
             const price = billingCycle === 'monthly' ? plan.priceMonthly : plan.priceYearly
@@ -404,125 +406,116 @@ export default function SubscriptionPage() {
             return (
               <div
                 key={plan.id}
-                className={`group relative bg-gradient-to-br ${colors.bg} ${colors.hover} rounded-2xl sm:rounded-3xl p-6 sm:p-8 border-2 ${colors.border} transition-all duration-700 shadow-soft-xl hover:shadow-2xl hover:-translate-y-4 hover:scale-[1.05] overflow-hidden ${
-                  mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                } ${plan.popular ? 'ring-2 sm:ring-4 ring-gold-400 ring-opacity-50 scale-105 z-10' : ''}`}
-                style={{ transitionDelay: `${200 + index * 100}ms` }}
+                className={`group relative bg-white/70 backdrop-blur-md rounded-[2.5rem] p-8 sm:p-10 border-2 transition-all duration-500 shadow-soft-2xl hover:shadow-gold-500/10 hover:-translate-y-4 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                  } ${plan.popular ? 'border-gold-400 scale-105 z-20 shadow-soft-2xl' : 'border-beige-200 hover:border-gold-200'}`}
+                style={{
+                  transitionDelay: `${200 + index * 100}ms`,
+                  boxShadow: plan.popular ? '0 30px 60px -12px rgba(212, 162, 60, 0.25)' : 'none'
+                }}
                 onMouseEnter={() => setHoveredPlan(plan.id)}
                 onMouseLeave={() => setHoveredPlan(null)}
               >
+                {/* Decorative background circle */}
+                <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${colors.glow} opacity-5 rounded-full -mr-16 -mt-16 blur-3xl group-hover:opacity-10 transition-opacity duration-700`}></div>
+
                 {/* Popular Badge */}
                 {plan.popular && (
-                  <div className="absolute top-0 right-0 bg-gradient-to-r from-gold-500 to-gold-600 text-white px-3 sm:px-4 py-0.5 sm:py-1 rounded-bl-xl sm:rounded-bl-2xl rounded-tr-2xl sm:rounded-tr-3xl text-xs sm:text-sm font-bold shadow-soft z-20">
+                  <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-gold-500 via-gold-600 to-gold-500 text-white px-6 py-2 rounded-full text-xs font-black tracking-[0.2em] shadow-soft-lg z-30 uppercase">
                     {t('subscription.mostPopular')}
                   </div>
                 )}
 
-                {/* Glow effect on hover */}
-                <div className={`absolute -inset-1 bg-gradient-to-r ${colors.glow} rounded-3xl opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-700`}></div>
-
-                {/* Shimmer overlay */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-                  <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
-                </div>
-
                 {/* Content */}
-                <div className="relative z-10">
-                  {/* Icon */}
-                  <div className={`mb-4 sm:mb-6 p-3 sm:p-4 bg-white/80 rounded-xl sm:rounded-2xl inline-flex ${colors.icon} group-hover:scale-125 group-hover:rotate-12 transition-all duration-500 shadow-soft`}>
-                    <div className="w-6 h-6 sm:w-8 sm:h-8">{plan.icon}</div>
+                <div className="relative z-10 flex flex-col h-full">
+                  {/* Icon & Label */}
+                  <div className="flex items-center gap-4 mb-8">
+                    <div className={`p-4 bg-gradient-to-br ${colors.bg} rounded-3xl ${colors.icon} group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-soft-lg flex-shrink-0`}>
+                      <div className="w-8 h-8">{plan.icon}</div>
+                    </div>
+                    <div>
+                      <h3 className="text-3xl font-black text-text-primary font-serif tracking-tight leading-none mb-1">{plan.name}</h3>
+                      <p className="text-text-tertiary text-[10px] font-black uppercase tracking-widest">{plan.id}</p>
+                    </div>
                   </div>
 
-                  {/* Plan Name */}
-                  <h3 className="text-2xl sm:text-3xl font-bold text-text-primary mb-2 font-serif">{plan.name}</h3>
-                  <p className="text-text-secondary text-xs sm:text-sm mb-4 sm:mb-6 min-h-[40px]">{plan.description}</p>
+                  <p className="text-text-secondary text-sm leading-relaxed mb-8 min-h-[48px] font-medium opacity-80">{plan.description}</p>
 
                   {/* Price */}
-                  <div className="mb-4 sm:mb-6">
-                    <div className="flex items-baseline gap-1 sm:gap-2">
-                      <span className="text-3xl sm:text-4xl font-bold text-text-primary">
-                        ${price}
+                  <div className="mb-10">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-text-primary text-lg font-bold opacity-60">$</span>
+                      <span className="text-5xl font-black text-text-primary tracking-tighter">
+                        {price}
                       </span>
-                      <span className="text-text-secondary text-sm sm:text-base">
-                        /{billingCycle === 'monthly' ? 'month' : 'year'}
+                      <span className="text-text-secondary text-base font-bold italic opacity-60">
+                        /{billingCycle === 'monthly' ? 'mo' : 'yr'}
                       </span>
                     </div>
                     {billingCycle === 'yearly' && plan.priceYearly > 0 && (
-                      <p className="text-xs sm:text-sm text-text-tertiary mt-1">
-                        ${plan.priceMonthly} {t('subscription.perMonth')} {t('subscription.billedAnnually')}
-                      </p>
+                      <div className="inline-block mt-3 px-3 py-1 bg-green-50 text-green-700 text-[10px] font-black rounded-lg uppercase tracking-wider">
+                        Billed annually
+                      </div>
                     )}
                   </div>
 
-                  {/* Questions per day */}
-                  <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-white/60 rounded-lg sm:rounded-xl border border-beige-200">
-                    <div className="text-xs sm:text-sm text-text-secondary mb-1">{t('subscription.questionsPerDay')}</div>
-                    <div className="text-xl sm:text-2xl font-bold text-text-primary">
-                      {plan.questionsPerDay}
-                    </div>
+                  {/* Features List */}
+                  <div className="flex-grow space-y-6 mb-10">
+                    <div className="text-[10px] font-black text-text-tertiary uppercase tracking-[0.2em] mb-4">What's included</div>
+                    <ul className="space-y-4">
+                      {plan.features.map((feature, idx) => (
+                        <li key={idx} className="flex items-start gap-3 group/item">
+                          <div className={`mt-0.5 p-1 rounded-full ${colors.icon} bg-opacity-10 bg-white shadow-sm flex-shrink-0 group-hover/item:scale-125 transition-transform`}>
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                            </svg>
+                          </div>
+                          <span className="text-text-primary text-sm font-semibold opacity-90 group-hover/item:opacity-100 transition-opacity">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
 
-                  {/* Delivery time */}
-                  <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-white/60 rounded-lg sm:rounded-xl border border-beige-200">
-                    <div className="text-xs sm:text-sm text-text-secondary mb-1">{t('subscription.deliveryTime')}</div>
-                    <div className="text-base sm:text-lg font-semibold text-text-primary">
-                      {plan.deliveryTime}
+                  {/* Quota Info Box */}
+                  <div className="grid grid-cols-2 gap-3 mb-10">
+                    <div className="bg-ivory-50/50 p-3 rounded-2xl border border-beige-100 text-center">
+                      <div className="text-[8px] font-black text-text-tertiary uppercase tracking-widest mb-1">Questions</div>
+                      <div className="text-lg font-black text-text-primary">{plan.questionsPerDay}</div>
+                    </div>
+                    <div className="bg-ivory-50/50 p-3 rounded-2xl border border-beige-100 text-center">
+                      <div className="text-[8px] font-black text-text-tertiary uppercase tracking-widest mb-1">Delivery</div>
+                      <div className="text-lg font-black text-text-primary whitespace-nowrap">{plan.deliveryTime.split(' ')[0]} {plan.deliveryTime.split(' ')[1]?.charAt(0)}</div>
                     </div>
                   </div>
-
-                  {/* Features */}
-                  <ul className="space-y-2 sm:space-y-3 mb-6 sm:mb-8">
-                    {plan.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-start gap-2 sm:gap-3">
-                        <svg
-                          className={`w-4 h-4 sm:w-5 sm:h-5 ${colors.icon} flex-shrink-0 mt-0.5`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                        <span className="text-text-secondary text-xs sm:text-sm">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  {/* Current Plan Badge */}
-                  {currentPlan === plan.id && (
-                    <div className="mb-3 sm:mb-4 p-2 sm:p-3 bg-gradient-to-r from-gold-500 to-gold-600 text-white rounded-lg sm:rounded-xl text-center font-semibold shadow-soft text-xs sm:text-sm">
-                      ✓ {t('subscription.currentPlan')}
-                    </div>
-                  )}
 
                   {/* CTA Button */}
-                  <button
-                    onClick={() => handleSubscribe(plan.id)}
-                    disabled={loading || currentPlan === plan.id}
-                    className={`w-full py-3 sm:py-4 bg-gradient-to-r ${colors.button} text-white rounded-lg sm:rounded-xl font-bold text-sm sm:text-base md:text-lg transition-all shadow-soft hover:shadow-soft-lg transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 ${
-                      currentPlan === plan.id ? 'opacity-60' : ''
-                    }`}
-                  >
-                    {loading && updatingPlan === plan.id ? (
-                      <span className="flex items-center justify-center gap-2">
-                        <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        {t('subscription.updating')}
-                      </span>
-                    ) : currentPlan === plan.id ? (
-                      t('subscription.currentPlan')
-                    ) : plan.priceMonthly === 0 ? (
-                      t('subscription.getStartedFree')
-                    ) : (
-                      `${t('subscription.switchTo')} ${plan.name}`
+                  <div className="mt-auto relative">
+                    {currentPlan === plan.id && (
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-gold-200 text-gold-800 text-[9px] font-black rounded-full uppercase tracking-widest z-10 border border-gold-400">
+                        Current Status
+                      </div>
                     )}
-                  </button>
+                    <button
+                      onClick={() => handleSubscribe(plan.id)}
+                      disabled={loading || currentPlan === plan.id}
+                      className={`w-full py-5 rounded-[1.5rem] font-black text-sm uppercase tracking-widest transition-all shadow-soft-xl hover:shadow-soft-2xl transform active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed ${currentPlan === plan.id
+                        ? 'bg-beige-100 text-text-tertiary border-2 border-beige-200'
+                        : plan.popular
+                          ? 'bg-gradient-to-r from-gold-500 via-gold-600 to-gold-500 text-white hover:scale-105 active:scale-95'
+                          : 'bg-white border-2 border-beige-200 text-text-primary hover:border-gold-400 hover:text-gold-600'
+                        }`}
+                    >
+                      {loading && updatingPlan === plan.id ? (
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                          <span>Processing</span>
+                        </div>
+                      ) : currentPlan === plan.id ? (
+                        'Active Plan'
+                      ) : (
+                        `Select Plan`
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
             )

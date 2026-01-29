@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import QuestionPanel from '@/app/components/QuestionPanel'
+import LanguageSwitcher from '@/app/components/LanguageSwitcher'
 import { useI18n } from '@/app/hooks/useI18n'
 
 export default function ChatPage() {
@@ -71,10 +72,11 @@ export default function ChatPage() {
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-1.5 sm:gap-3">
+              <LanguageSwitcher />
               <Link
                 href="/settings"
-                className="p-2 sm:p-2.5 bg-white border-2 border-beige-300 hover:border-gold-400 text-text-primary rounded-lg sm:rounded-xl transition-all shadow-soft hover:shadow-soft-lg flex items-center justify-center flex-shrink-0"
+                className="p-1.5 sm:p-2.5 bg-white border-2 border-beige-300 hover:border-gold-400 text-text-primary rounded-lg sm:rounded-xl transition-all shadow-soft hover:shadow-soft-lg flex items-center justify-center flex-shrink-0"
                 title={t('common.settings')}
               >
                 <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -92,7 +94,7 @@ export default function ChatPage() {
                     console.error('Logout failed:', error)
                   }
                 }}
-                className="p-2 sm:p-2.5 bg-red-500 hover:bg-red-600 text-white rounded-lg sm:rounded-xl transition-all shadow-soft hover:shadow-soft-lg flex items-center justify-center flex-shrink-0"
+                className="p-1.5 sm:p-2.5 bg-red-500 hover:bg-red-600 text-white rounded-lg sm:rounded-xl transition-all shadow-soft hover:shadow-soft-lg flex items-center justify-center flex-shrink-0"
                 title={t('common.logout')}
               >
                 <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
