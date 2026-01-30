@@ -229,6 +229,123 @@ export async function analyzeAllPalmImages(
 export function isVisionAPIAvailable(): boolean {
   return !!(
     process.env.GOOGLE_APPLICATION_CREDENTIALS ||
-    process.env.GOOGLE_SERVICE_ACCOUNT_JSON
+    process.env.GOOGLE_SERVICE_ACCOUNT_JSON ||
+    // Also check for NEXT_PUBLIC version if used on client (though usually server-side)
+    process.env.NEXT_PUBLIC_GOOGLE_SERVICE_ACCOUNT_JSON
   )
+}
+
+/**
+ * Interface for palm validation results
+ */
+export interface PalmValidationResult {
+  isValid: boolean
+  confidence: number
+  isHand: boolean
+  hasDistractors: boolean // e.g., mobile phone, pets
+  message: string
+  labels: string[]
+}
+
+/**
+ * Validate if an image contains a palm and is not a distractor object
+ * This is the "Enterprise Gate" to prevent fake uploads
+ */
+export async function validateIsPalm(
+  imageBuffer: Buffer,
+  palmType: string
+): Promise<PalmValidationResult> {
+  const client = getVisionClient()
+
+  if (!client) {
+    console.warn('Google Cloud Vision API not configured for validation. Skipping.')
+    // Fallback if not configured: allow but log
+    return {
+      isValid: true,
+      confidence: 0.5,
+      isHand: true,
+      hasDistractors: false,
+      message: 'Validation skipped: Vision API not configured',
+      labels: [],
+    }
+  }
+
+  try {
+    // Perform label detection and object localization
+    const [labelResult, objectResult] = await Promise.all([
+      client.labelDetection({ image: { content: imageBuffer } }),
+      client.objectLocalization({ image: { content: imageBuffer } }),
+    ])
+
+    const labels = labelResult[0].labelAnnotations || []
+    const objects = objectResult[0].localizedObjectAnnotations || []
+
+    const labelDescriptions = labels.map(l => l.description?.toLowerCase() || '')
+    const objectNames = objects.map(o => o.name?.toLowerCase() || '')
+
+    // 1. Check for Hand/Palm presence
+    const handKeywords = ['hand', 'palm', 'finger', 'thumb', 'arm', 'gesture', 'wrist']
+    const handLabels = labels.filter(l =>
+      handKeywords.some(kw => l.description?.toLowerCase().includes(kw))
+    )
+
+    const isHandDetected = handLabels.length > 0 ||
+      objectNames.some(name => name.includes('hand') || name.includes('person'))
+
+    // Calculate hand confidence
+    const handConfidence = handLabels.length > 0
+      ? Math.max(...handLabels.map(l => l.score || 0))
+      : (isHandDetected ? 0.6 : 0)
+
+    // 2. Check for Distractors (Mobile phones, electronics, etc.)
+    const distractorKeywords = ['mobile phone', 'phone', 'smartphone', 'gadget', 'electronics', 'camera', 'laptop', 'computer']
+    const detectedDistractors = labelDescriptions.filter(desc =>
+      distractorKeywords.some(kw => desc.includes(kw))
+    ) || objectNames.filter(name =>
+      distractorKeywords.some(kw => name.includes(kw))
+    )
+
+    const hasDistractors = detectedDistractors.length > 0
+
+    // 3. Final Decision Logic (Enterprise Level)
+    let isValid = isHandDetected && !hasDistractors
+    let message = 'Palm image validated successfully.'
+
+    if (!isHandDetected) {
+      isValid = false
+      message = 'No hand or palm detected in the image. Please upload a clear photo of your palm.'
+    } else if (hasDistractors) {
+      // If a hand is there but so is a phone, it might be a photo of a photo or a selfie with a phone
+      // To be strict (Enterprise), we reject if a phone is clearly visible
+      isValid = false
+      message = 'A mobile phone or other electronic device was detected. Please upload a clear photo of ONLY your palm.'
+    }
+
+    // Edge case: if it's "Skin" or "Texture" but not "Hand", might be a close-up
+    if (!isValid && (labelDescriptions.includes('skin') || labelDescriptions.includes('flesh'))) {
+      if (handConfidence > 0.4) {
+        isValid = true
+        message = 'Palm detected via skin texture analysis.'
+      }
+    }
+
+    return {
+      isValid,
+      confidence: handConfidence,
+      isHand: isHandDetected,
+      hasDistractors,
+      message,
+      labels: labelDescriptions.slice(0, 10),
+    }
+  } catch (error) {
+    console.error('Error during palm validation:', error)
+    return {
+      isValid: true, // Fail-safe: allow if API error, but log
+      confidence: 0,
+      isHand: true,
+      hasDistractors: false,
+      message: `Validation error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      labels: [],
+    }
+  }
 }

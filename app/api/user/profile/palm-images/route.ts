@@ -60,6 +60,19 @@ export async function POST(request: NextRequest) {
     const arrayBuffer = await file.arrayBuffer()
     const buffer = Buffer.from(arrayBuffer)
 
+    // --- ENTERPRISE VALIDATION GATE ---
+    // Validate if the image is actually a palm and not a mobile phone/object
+    const { validateIsPalm } = await import('@/lib/services/vision-api')
+    const validation = await validateIsPalm(buffer, palmType)
+
+    if (!validation.isValid) {
+      return createErrorResponse(
+        validation.message,
+        400
+      )
+    }
+    // --- END VALIDATION GATE ---
+
     // Upload to Supabase Storage
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('palm-images')
@@ -79,10 +92,9 @@ export async function POST(request: NextRequest) {
     // If dimensions are missing or invalid, estimate from file size
     // This allows uploads to proceed even if client-side dimension extraction fails
     if (width === 0 || height === 0 || isNaN(width) || isNaN(height)) {
-      
+
       // Estimate dimensions from file size
       // Typical palm image: ~500KB = ~1200x1600px
-      // Rough formula: sqrt(file_size_in_kb * 2000) gives approximate pixel count
       const estimatedPixels = Math.sqrt((file.size / 1024) * 2000)
       width = Math.round(estimatedPixels * 0.75) || 1200
       height = Math.round(estimatedPixels * 1.0) || 1600
@@ -99,7 +111,8 @@ export async function POST(request: NextRequest) {
         file_size: file.size,
         width: width, // Validated dimensions
         height: height, // Validated dimensions
-        matching_status: 'pending',
+        matching_status: validation.confidence > 0.8 ? 'pending' : 'flagged', // Mark as flagged if confidence is low
+        matching_score: validation.confidence, // Store vision confidence initially
         uploaded_at: new Date().toISOString(),
       })
       .select()

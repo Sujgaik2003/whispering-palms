@@ -37,19 +37,27 @@ function getResendClient() {
 function getZohoTransporter() {
   const zohoUser = process.env.ZOHO_MAIL_USER
   const zohoPassword = process.env.ZOHO_MAIL_PASSWORD
+  const zohoHost = process.env.ZOHO_MAIL_HOST || 'smtp.zoho.com'
 
   if (!zohoUser || !zohoPassword) {
     throw new Error('Zoho Mail SMTP not configured')
   }
 
+  console.log(`[Email] Attempting Zoho login for: ${zohoUser} using host: ${zohoHost}`)
+
   return nodemailer.createTransport({
-    host: 'smtp.zoho.com',
+    host: zohoHost,
     port: 465,
     secure: true,
     auth: {
       user: zohoUser,
       pass: zohoPassword,
     },
+    // Adding keepalive and timeout to prevent connection drops
+    pool: true,
+    maxConnections: 1,
+    rateDelta: 1000,
+    rateLimit: 1
   })
 }
 

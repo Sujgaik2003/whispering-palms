@@ -57,7 +57,6 @@ export function extractBasicFeatures(
 /**
  * Calculate matching confidence between two palm features
  * Returns a confidence score between 0 and 1
- * More robust algorithm that validates actual palm presence
  */
 export function calculateMatchingConfidence(
   rightFeatures: PalmFeatures,
@@ -65,125 +64,86 @@ export function calculateMatchingConfidence(
   rightFileSize?: number,
   leftFileSize?: number
 ): number {
-  // Validation: Check if images are too small (likely not a palm or empty image)
-  // Very loose thresholds - only catch extreme cases
-  const MIN_PALM_AREA = 100000 // Very minimum pixels (~400x250) - very loose
-  const MAX_PALM_AREA = 20000000 // Maximum pixels - very loose
-  
-  // Check if one image is significantly smaller than the other (likely different content)
-  const areaRatio = Math.min(rightFeatures.area, leftFeatures.area) / 
-                   Math.max(rightFeatures.area, leftFeatures.area)
-  
-  // Only reject if images are extremely small
-  if (rightFeatures.area < MIN_PALM_AREA || leftFeatures.area < MIN_PALM_AREA) {
-    // One or both images are extremely small - likely invalid
-    return 0.3 // Still give some confidence
-  }
-  
-  // Don't reject large images - just continue
-  // if (rightFeatures.area > MAX_PALM_AREA || leftFeatures.area > MAX_PALM_AREA) {
-  //   return 0.3
-  // }
-  
-  // Only reject if images are extremely different (less than 10% of the size)
-  if (areaRatio < 0.1) {
-    return 0.35 // Still give some confidence
+  // --- ENTERPRISE CHECK: Exact Duplicate Detection ---
+  // If metadata is 100% identical, it's likely the SAME image uploaded twice (user error or cheating)
+  const isExactMetadataMatch =
+    rightFeatures.width === leftFeatures.width &&
+    rightFeatures.height === leftFeatures.height &&
+    rightFileSize === leftFileSize &&
+    rightFileSize !== undefined
+
+  if (isExactMetadataMatch) {
+    // We penalize exact matches because left and right palms are MIRROR images,
+    // they should never be identical computer files.
+    return 0.15
   }
 
-  // Validation: Check aspect ratio (palms should be roughly portrait, not square/landscape)
-  // Very loose range - accept almost any aspect ratio
-  const VALID_ASPECT_RATIO_MIN = 0.2
-  const VALID_ASPECT_RATIO_MAX = 2.0
-  
-  const rightValidAspect = rightFeatures.aspectRatio >= VALID_ASPECT_RATIO_MIN && 
-                           rightFeatures.aspectRatio <= VALID_ASPECT_RATIO_MAX
-  const leftValidAspect = leftFeatures.aspectRatio >= VALID_ASPECT_RATIO_MIN && 
-                          leftFeatures.aspectRatio <= VALID_ASPECT_RATIO_MAX
-  
-  // Don't reject based on aspect ratio - just continue
-  // if (!rightValidAspect || !leftValidAspect) {
-  //   return 0.3
-  // }
-
-  // Aspect ratio similarity (0-1)
-  // Palms should have similar aspect ratios
-  const aspectRatioDiff = Math.abs(
-    rightFeatures.aspectRatio - leftFeatures.aspectRatio
-  )
-  // Very loose: larger difference = lower similarity (minimal penalty)
-  const aspectRatioSimilarity = Math.max(0, 1 - (aspectRatioDiff * 1))
-
-  // Size similarity (0-1)
-  // Both palms should be roughly similar in size (very loose)
-  const sizeRatio = Math.min(rightFeatures.area, leftFeatures.area) /
+  // --- 1. Basic Dimension Gate ---
+  // If one image is extremely smaller/different, reject
+  const areaRatio = Math.min(rightFeatures.area, leftFeatures.area) /
     Math.max(rightFeatures.area, leftFeatures.area)
-  
-  // Very loose: minimal penalty for size differences
-  let sizeSimilarity = sizeRatio
-  if (sizeRatio < 0.3) {
-    // More than 70% size difference - minimal penalty
-    sizeSimilarity = sizeRatio * 0.8 // Very minimal penalty
+
+  if (areaRatio < 0.25) {
+    // Images differ by more than 4x in size - high mismatch probability
+    return 0.3
   }
 
-  // File size similarity (if available)
-  // Similar file sizes suggest similar image quality/content
+  // --- 2. Aspect Ratio Similarity ---
+  // Palms of the same person usually have very similar aspect ratios
+  const aspectRatioDiff = Math.abs(rightFeatures.aspectRatio - leftFeatures.aspectRatio)
+  // Tight threshold: diff of 0.1 is ~10% variation
+  const aspectRatioSimilarity = Math.max(0, 1 - (aspectRatioDiff * 2))
+
+  // --- 3. Size Similarity ---
+  // When captured with the same camera, hands should occupy similar pixel area
+  let sizeSimilarity = areaRatio
+
+  // --- 4. File Size Logic ---
   let fileSizeSimilarity = 1.0
   if (rightFileSize && leftFileSize && rightFileSize > 0 && leftFileSize > 0) {
-    const fileSizeRatio = Math.min(rightFileSize, leftFileSize) / 
-                         Math.max(rightFileSize, leftFileSize)
-    
-    // Very loose: minimal penalty for file size differences
-    if (fileSizeRatio < 0.1) {
-      // One file is extremely smaller
-      fileSizeSimilarity = 0.7 // Minimal penalty
-    } else {
-      fileSizeSimilarity = fileSizeRatio
-    }
+    const fileSizeRatio = Math.min(rightFileSize, leftFileSize) /
+      Math.max(rightFileSize, leftFileSize)
+    fileSizeSimilarity = fileSizeRatio
   }
 
-  // Combined confidence (weighted average - similar to original)
-  // Aspect ratio: 40%, Size: 60% (like original)
+  // --- 5. Final Weighted Scoring (Enterprise Tuned) ---
+  // We weight Aspect Ratio heavily (60%) because it's invariant to distance
+  // Area similarity (30%) and File Size similarity (10%)
   let confidence = (
-    aspectRatioSimilarity * 0.4 + 
-    sizeSimilarity * 0.6
+    aspectRatioSimilarity * 0.6 +
+    sizeSimilarity * 0.3 +
+    fileSizeSimilarity * 0.1
   )
-  
-  // If file size is available, use it to adjust slightly (minimal impact)
-  if (rightFileSize && leftFileSize) {
-    confidence = (confidence * 0.9) + (fileSizeSimilarity * 0.1)
-  }
 
-  // Very loose validation: Only cap if features are extremely different
-  if (aspectRatioSimilarity < 0.1 || sizeSimilarity < 0.1) {
-    // Features are extremely different
-    return Math.min(confidence, 0.6) // Cap at 60% only if extremely different
-  }
-
-  // Ensure minimum confidence is reasonable (don't go too low)
-  return Math.min(1, Math.max(0.4, confidence))
+  // Cap and Clamp
+  return Math.min(0.98, Math.max(0.1, confidence))
 }
 
 /**
  * Determine matching status based on confidence score
- * Looser thresholds - similar to original but slightly tighter
+ * Enterprise Thresholds:
+ * - > 85%: Strong Match
+ * - 65% - 85%: Potential Match
+ * - < 65%: Mismatch
  */
 export function determineMatchingStatus(confidence: number): {
   status: 'matched' | 'mismatch'
   message: string
 } {
-  // Looser thresholds (similar to original):
-  // >= 50% = matched (like original)
-  // < 50% = mismatch
-  
-  if (confidence >= 0.50) {
+  if (confidence >= 0.75) {
     return {
       status: 'matched',
       message: 'Palms verified! Both palms belong to the same person.',
     }
+  } else if (confidence >= 0.15 && confidence < 0.40) {
+    return {
+      status: 'mismatch',
+      message: 'Suspicious match: It looks like you uploaded the same photo twice. Please upload different photos for your Right and Left palms.',
+    }
   } else {
     return {
       status: 'mismatch',
-      message: 'Palms do not match. Please re-upload clear photos of both palms from the same person.',
+      message: 'Palms do not match. Please ensure both photos are clear and belong to the same person.',
     }
   }
 }
@@ -202,7 +162,7 @@ export function matchPalms(
 
   // Calculate confidence with file size validation
   const confidence = calculateMatchingConfidence(
-    rightFeatures, 
+    rightFeatures,
     leftFeatures,
     rightPalm.fileSize,
     leftPalm.fileSize
