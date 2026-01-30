@@ -16,27 +16,35 @@ function getVisionClient(): ImageAnnotatorClient | null {
   try {
     // Option 1: Service account JSON file path
     if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
-      return new ImageAnnotatorClient({
+      console.log('[Vision API] Using credentials from:', process.env.GOOGLE_APPLICATION_CREDENTIALS)
+      const client = new ImageAnnotatorClient({
         keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
       })
+      console.log('[Vision API] Client initialized successfully')
+      return client
     }
 
     // Option 2: Service account JSON as string
     if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
+      console.log('[Vision API] Using credentials from GOOGLE_SERVICE_ACCOUNT_JSON')
       const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON)
-      return new ImageAnnotatorClient({
+      const client = new ImageAnnotatorClient({
         credentials,
       })
+      console.log('[Vision API] Client initialized successfully')
+      return client
     }
 
     // Option 3: Try default credentials (if running on GCP or with gcloud auth)
+    console.log('[Vision API] No credentials found, trying default...')
     try {
       return new ImageAnnotatorClient()
     } catch {
+      console.warn('[Vision API] No default credentials available')
       return null
     }
   } catch (error) {
-    console.error('Error initializing Google Cloud Vision client:', error)
+    console.error('[Vision API] Error initializing client:', error)
     return null
   }
 }
@@ -245,6 +253,8 @@ export interface PalmValidationResult {
   hasDistractors: boolean // e.g., mobile phone, pets
   message: string
   labels: string[]
+  landmarks?: Array<{ x: number; y: number; z?: number }>
+  handedness?: 'Left' | 'Right' | 'Unknown'
 }
 
 /**
@@ -271,6 +281,8 @@ export async function validateIsPalm(
   }
 
   try {
+    console.log('[Vision API] Starting palm validation...')
+
     // Perform label detection and object localization
     const [labelResult, objectResult] = await Promise.all([
       client.labelDetection({ image: { content: imageBuffer } }),
@@ -282,6 +294,10 @@ export async function validateIsPalm(
 
     const labelDescriptions = labels.map(l => l.description?.toLowerCase() || '')
     const objectNames = objects.map(o => o.name?.toLowerCase() || '')
+
+    // Log detected labels for debugging
+    console.log('[Vision API] Detected labels:', labelDescriptions.slice(0, 15).join(', '))
+    console.log('[Vision API] Detected objects:', objectNames.join(', '))
 
     // 1. Check for Hand/Palm presence
     const handKeywords = ['hand', 'palm', 'finger', 'thumb', 'arm', 'gesture', 'wrist']
@@ -297,8 +313,14 @@ export async function validateIsPalm(
       ? Math.max(...handLabels.map(l => l.score || 0))
       : (isHandDetected ? 0.6 : 0)
 
-    // 2. Check for Distractors (Mobile phones, electronics, etc.)
-    const distractorKeywords = ['mobile phone', 'phone', 'smartphone', 'gadget', 'electronics', 'camera', 'laptop', 'computer']
+    console.log('[Vision API] Hand detected:', isHandDetected, '| Confidence:', handConfidence.toFixed(2))
+
+    // 2. Check for Distractors (Mobile phones, electronics, earbuds, etc.)
+    const distractorKeywords = [
+      'mobile phone', 'phone', 'smartphone', 'gadget', 'electronics',
+      'camera', 'laptop', 'computer', 'earbuds', 'headphones', 'airpods',
+      'earbud', 'headphone', 'audio equipment', 'electronic device'
+    ]
     const detectedDistractors = labelDescriptions.filter(desc =>
       distractorKeywords.some(kw => desc.includes(kw))
     ) || objectNames.filter(name =>
@@ -307,27 +329,37 @@ export async function validateIsPalm(
 
     const hasDistractors = detectedDistractors.length > 0
 
-    // 3. Final Decision Logic (Enterprise Level)
+    if (hasDistractors) {
+      console.log('[Vision API] DISTRACTORS DETECTED:', detectedDistractors.join(', '))
+    }
+
+    // 3. Final Decision Logic (Enterprise Level - STRICT)
     let isValid = isHandDetected && !hasDistractors
     let message = 'Palm image validated successfully.'
 
     if (!isHandDetected) {
       isValid = false
       message = 'No hand or palm detected in the image. Please upload a clear photo of your palm.'
+      console.log('[Vision API] REJECTED: No hand detected')
     } else if (hasDistractors) {
-      // If a hand is there but so is a phone, it might be a photo of a photo or a selfie with a phone
-      // To be strict (Enterprise), we reject if a phone is clearly visible
       isValid = false
-      message = 'A mobile phone or other electronic device was detected. Please upload a clear photo of ONLY your palm.'
+      message = 'An electronic device (phone, earbuds, etc.) was detected. Please upload a clear photo of ONLY your palm.'
+      console.log('[Vision API] REJECTED: Distractor detected')
+    } else {
+      console.log('[Vision API] ACCEPTED: Valid palm image')
     }
 
-    // Edge case: if it's "Skin" or "Texture" but not "Hand", might be a close-up
-    if (!isValid && (labelDescriptions.includes('skin') || labelDescriptions.includes('flesh'))) {
-      if (handConfidence > 0.4) {
+    // Edge case: if it's "Skin" but not "Hand" with high confidence, allow it
+    if (!isValid && !hasDistractors && labelDescriptions.includes('skin')) {
+      const skinLabel = labels.find(l => l.description?.toLowerCase() === 'skin')
+      if (skinLabel && (skinLabel.score || 0) > 0.7) {
         isValid = true
         message = 'Palm detected via skin texture analysis.'
+        console.log('[Vision API] ACCEPTED: Via skin texture with high confidence')
       }
     }
+
+    console.log('[Vision API] Final result:', isValid ? 'VALID' : 'INVALID', '| Message:', message)
 
     return {
       isValid,
@@ -349,3 +381,28 @@ export async function validateIsPalm(
     }
   }
 }
+
+/**
+ * Extract palm landmarks for matching
+ * Uses MediaPipe service for landmark extraction
+ */
+export async function extractPalmLandmarks(
+  imageBuffer: Buffer
+): Promise<{
+  landmarks: Array<{ x: number; y: number; z?: number }>
+  handedness: 'Left' | 'Right' | 'Unknown'
+}> {
+  try {
+    const { extractLandmarks } = await import('./mediapipe-service')
+    return await extractLandmarks(imageBuffer)
+  } catch (error) {
+    console.error('Error extracting palm landmarks:', error)
+    return {
+      landmarks: [],
+      handedness: 'Unknown'
+    }
+  }
+}
+
+// Re-export types
+export type HandLandmark = { x: number; y: number; z?: number }
