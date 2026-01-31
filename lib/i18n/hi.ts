@@ -139,6 +139,7 @@ export default {
   'home.securePrivate': 'सुरक्षित और निजी',
   'home.termsConditions': 'नियम और शर्तें',
   'home.privacyPolicy': 'गोपनीयता नीति',
+  'home.aboutUs': 'हमारे बारे में',
   'home.copyright': 'सभी अधिकार सुरक्षित',
 
   // Onboarding

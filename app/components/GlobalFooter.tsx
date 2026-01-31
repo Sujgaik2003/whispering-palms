@@ -42,6 +42,9 @@ export default function GlobalFooter() {
                     ))}
                 </div>
                 <div className="flex items-center gap-4 sm:gap-6 flex-wrap justify-center">
+                    <Link href="/about" className="hover:text-text-primary transition-colors duration-300 hover:underline whitespace-nowrap">
+                        {t('home.aboutUs')}
+                    </Link>
                     <Link href="/terms" className="hover:text-text-primary transition-colors duration-300 hover:underline whitespace-nowrap">
                         {t('home.termsConditions')}
                     </Link>

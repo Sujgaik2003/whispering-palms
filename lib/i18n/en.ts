@@ -139,6 +139,7 @@ export default {
   'home.securePrivate': 'Secure & Private',
   'home.termsConditions': 'Terms & Conditions',
   'home.privacyPolicy': 'Privacy Policy',
+  'home.aboutUs': 'About Us',
   'home.copyright': 'All rights reserved',
 
   // Onboarding
@@ -248,7 +249,6 @@ export default {
   'chat.dashboard': 'Dashboard',
   'chat.typeYourQuestion': 'Type your question here...',
   'chat.answerDeliveryNote': 'Your answer will be delivered via email based on your subscription plan.',
-  'chat.submit': 'Submit',
 
   // Subscription Plans
   'plan.basic': 'Basic',

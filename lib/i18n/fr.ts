@@ -139,6 +139,7 @@ export default {
   'home.securePrivate': 'Sécurisé et Privé',
   'home.termsConditions': 'Termes et Conditions',
   'home.privacyPolicy': 'Politique de Confidentialité',
+  'home.aboutUs': 'À Propos de Nous',
   'home.copyright': 'Tous droits réservés',
 
   // Onboarding - French (using English as fallback for now, can be translated later)

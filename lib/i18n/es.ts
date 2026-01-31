@@ -139,6 +139,7 @@ export default {
   'home.securePrivate': 'Seguro y Privado',
   'home.termsConditions': 'Términos y Condiciones',
   'home.privacyPolicy': 'Política de Privacidad',
+  'home.aboutUs': 'Sobre Nosotros',
   'home.copyright': 'Todos los derechos reservados',
 
   // Onboarding - Spanish translations

@@ -139,6 +139,7 @@ export default {
   'home.securePrivate': 'Sicher und Privat',
   'home.termsConditions': 'Allgemeine Geschäftsbedingungen',
   'home.privacyPolicy': 'Datenschutzrichtlinie',
+  'home.aboutUs': 'Über Uns',
   'home.copyright': 'Alle Rechte vorbehalten',
 
   // Onboarding - German
