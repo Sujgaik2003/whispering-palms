@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import WhisperingPalmsLogo from '@/app/components/Logo'
 import PalmMatchingStatus from '@/app/components/PalmMatchingStatus'
 import LanguageSwitcher from '@/app/components/LanguageSwitcher'
 import { useI18n } from '@/app/hooks/useI18n'
@@ -247,11 +248,9 @@ export default function DashboardPage() {
         <div className={`bg-gradient-to-br from-gold-50/90 via-ivory-100/90 to-gold-50/90 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-soft-xl border border-gold-200/50 mb-4 sm:mb-6 transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4">
             <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
-              <div className="p-2 sm:p-3 bg-gradient-to-br from-gold-400 to-gold-600 rounded-xl sm:rounded-2xl shadow-soft animate-pulse-soft hover:scale-110 transition-transform duration-300 flex-shrink-0">
-                <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                </svg>
-              </div>
+              <Link href="/" className="hover:opacity-80 transition-opacity flex-shrink-0">
+                <WhisperingPalmsLogo className="w-10 h-10 sm:w-12 sm:h-12" />
+              </Link>
               <div key={`welcome-${language}-${renderKey}`} className="min-w-0 flex-1">
                 <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-primary mb-1 truncate">{t('dashboard.title')}</h1>
                 <p className="text-text-secondary text-xs sm:text-sm md:text-base break-words">{t('common.welcome')}, <span className="text-gold-600 font-semibold">{user?.name || user?.email}</span>!</p>
