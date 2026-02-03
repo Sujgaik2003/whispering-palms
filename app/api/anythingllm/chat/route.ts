@@ -6,8 +6,8 @@ import {
   fetchUserContext,
   generateImageSignedUrls,
   formatUserContextForLLM,
+  extractPalmistryData, // 🔥 NEW: Extract actual palmistry features
 } from '@/lib/services/user-context'
-import { analyzeAllPalmImages } from '@/lib/services/vision-api'
 
 /**
  * POST /api/anythingllm/chat
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
           .single()
 
         const userName = userData?.name || userData?.email?.split('@')[0] || 'User'
-        
+
         // Create new workspace
         const newWorkspaceId = await anythingLLMService.createWorkspace(user.id, userName)
 
@@ -99,14 +99,16 @@ export async function POST(request: NextRequest) {
     // Step 1: Fetch user context from database
     const userContext = await fetchUserContext(user.id)
 
-    // Step 2: Generate signed URLs for palm images and analyze them
+    // Step 2: Extract structured palmistry data from palm images
+    // 🔥 CRITICAL CHANGE: Extract ACTUAL palmistry features (marriage lines, heart lines, etc.)
     let palmDescriptions: Map<string, string> = new Map()
     if (userContext.palmImages.length > 0) {
       try {
         const imagesWithUrls = await generateImageSignedUrls(userContext.palmImages)
-        palmDescriptions = await analyzeAllPalmImages(imagesWithUrls)
+        palmDescriptions = await extractPalmistryData(imagesWithUrls)
+        console.log('[Chat API] ✅ Palmistry extraction complete')
       } catch (error) {
-        console.error('Error analyzing palm images:', error)
+        console.error('[Chat API] Error extracting palmistry data:', error)
         // Continue without palm descriptions if analysis fails
       }
     }

@@ -4,7 +4,7 @@
  * Returns structured JSON data - NO palmistry interpretation
  */
 
-import * as sharp from 'sharp'
+import sharp from 'sharp'
 import type { Point2D } from './palm-geometry'
 import {
   distance,
@@ -215,10 +215,11 @@ export async function extractPalmFeatures(
       .raw()
       .toBuffer({ resolveWithObject: true })
 
-    // Try to detect hand using MediaPipe Hands
-    // Note: MediaPipe Hands is primarily browser-based, so we'll use a fallback approach
-    // For Node.js, we can use basic image processing or integrate MediaPipe via WASM
-    const handLandmarks = await detectHandLandmarks(rgbBuffer.data, width, height)
+    // 🔥 CRITICAL FIX: Pass original image buffer to MediaPipe
+    // MediaPipe service expects JPEG/PNG buffer, NOT raw RGB data
+    // Use the original imageBuffer from fetch, not rgbBuffer.data
+    const originalImageBuffer = Buffer.from(imageBuffer)
+    const handLandmarks = await detectHandLandmarks(originalImageBuffer, width, height)
 
     if (handLandmarks && handLandmarks.length > 0) {
       features.handDetected = true
@@ -233,52 +234,81 @@ export async function extractPalmFeatures(
       )
 
       Object.assign(features, extractedFeatures)
+      return features
     } else {
-      // Fallback: Use basic image analysis if hand detection fails
-      console.warn(
-        `Hand detection failed for ${palmType}, using basic image analysis`
-      )
-      const basicFeatures = await extractBasicFeatures(
-        rgbBuffer.data,
-        width,
-        height
-      )
-      Object.assign(features, basicFeatures)
+      // ❌ HARD FAIL: No hand detected
+      // DO NOT use fallback fake analysis
+      // Throw error to propagate up and show retry message to user
+      console.error(`[Palm Extraction] ❌ Hand detection failed for ${palmType}`)
+      console.error(`[Palm Extraction] No hand landmarks detected - image quality insufficient`)
+
+      throw new Error('PALM_DETECTION_FAILED: Could not detect clear palm in image. Please upload a clearer photo with fingers spread and palm facing camera.')
+    }
+  } catch (error) {
+    // Re-throw palm detection errors as-is
+    if (error instanceof Error && error.message.includes('PALM_DETECTION_FAILED')) {
+      throw error
     }
 
-    return features
-  } catch (error) {
-    console.error(`Error extracting palm features (${palmType}):`, error)
-    // Return minimal features on error
-    return {
-      imageWidth: 0,
-      imageHeight: 0,
-      imageAspectRatio: 0,
-      handDetected: false,
-    }
+    console.error(`[Palm Extraction] Error:`, error)
+    throw new Error(`Failed to process palm image: ${error instanceof Error ? error.message : 'Unknown error'}`)
   }
 }
 
 /**
- * Detect hand landmarks using MediaPipe Hands
- * This is a placeholder that will be implemented with actual MediaPipe integration
- * For now, returns null to trigger fallback
+ * Detect hand landmarks using TensorFlow.js HandPose or MediaPipe
+ * Attempts to detect palm landmarks for palmistry analysis
+ * 
+ * CRITICAL: Returns null if hand detection fails - this will trigger hard fail
  */
 async function detectHandLandmarks(
   imageData: Buffer,
   width: number,
   height: number
 ): Promise<HandLandmark[] | null> {
-  // TODO: Integrate MediaPipe Hands for Node.js
-  // Options:
-  // 1. Use @mediapipe/hands with proper Node.js setup
-  // 2. Use MediaPipe via WASM
-  // 3. Use TensorFlow.js with hand pose model
-  // 4. Use OpenCV with hand detection models
+  try {
+    // Try to use MediaPipe Hands service if available
+    // This is imported from mediapipe-service.ts if it exists
+    try {
+      const mediapipeService = await import('./mediapipe-service')
+      if (mediapipeService && mediapipeService.extractLandmarks) {
+        console.log('[Palm Detection] Using MediaPipe service...')
+        const result = await mediapipeService.extractLandmarks(imageData)
 
-  // For POC, return null to use basic feature extraction
-  // This allows the system to work while MediaPipe integration is being set up
-  return null
+        if (result && result.landmarks && result.landmarks.length > 0) {
+          console.log('[Palm Detection] ✓ MediaPipe detected', result.landmarks.length, 'landmarks')
+          return result.landmarks.map(lm => ({
+            x: lm.x,
+            y: lm.y,
+            z: lm.z || 0,
+            visibility: 1.0
+          }))
+        }
+      }
+    } catch (mediapipeError) {
+      // MediaPipe service not available, continue to fallback
+      console.log('[Palm Detection] MediaPipe service not available:',
+        mediapipeError instanceof Error ? mediapipeError.message : 'Unknown error')
+    }
+
+    // Fallback: Use TensorFlow.js HandPose model (if available)
+    try {
+      // Note: This requires @tensorflow-models/hand-pose-detection to be installed
+      // For production, install: npm install @tensorflow-models/hand-pose-detection @tensorflow/tfjs-node
+
+      // For now, we'll return null to indicate detection failed
+      // This will trigger the hard fail path
+      console.log('[Palm Detection] ⚠️ No hand detection library available')
+      console.log('[Palm Detection] Install: npm install @tensorflow-models/hand-pose-detection @tensorflow/tfjs-node')
+      return null
+    } catch (tfError) {
+      console.error('[Palm Detection] TensorFlow.js error:', tfError)
+      return null
+    }
+  } catch (error) {
+    console.error('[Palm Detection] Fatal error:', error)
+    return null
+  }
 }
 
 /**

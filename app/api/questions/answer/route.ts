@@ -9,8 +9,8 @@ import {
   fetchUserContext,
   generateImageSignedUrls,
   formatUserContextForLLM,
+  extractPalmistryData, // 🔥 NEW: Extract actual palmistry features instead of generic vision labels
 } from '@/lib/services/user-context'
-import { analyzeAllPalmImages } from '@/lib/services/vision-api'
 import { scheduleEmailDelivery, getDeliveryDelay, generateAnswerEmail } from '@/lib/services/email'
 import { voiceRSSTTSService } from '@/lib/services/voicerss-tts'
 
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
           .single()
 
         const userName = userData?.name || userData?.email?.split('@')[0] || 'User'
-        
+
         // Create new workspace
         const newWorkspaceId = await anythingLLMService.createWorkspace(user.id, userName)
 
@@ -137,14 +137,18 @@ export async function POST(request: NextRequest) {
     // Step 1: Fetch user context from database (direct injection, no RAG)
     const userContextData = await fetchUserContext(user.id)
 
-    // Step 2: Generate signed URLs for palm images and analyze them
+    // Step 2: Extract structured palmistry data from palm images
+    // 🔥 CRITICAL CHANGE: We now extract ACTUAL palmistry features (marriage lines, heart lines, etc.)
+    // instead of generic computer vision labels ("Finger", "White", "Gesture")
     let palmDescriptions: Map<string, string> = new Map()
     if (userContextData.palmImages.length > 0) {
       try {
+        console.log('[API] Extracting palmistry data from', userContextData.palmImages.length, 'palm images...')
         const imagesWithUrls = await generateImageSignedUrls(userContextData.palmImages)
-        palmDescriptions = await analyzeAllPalmImages(imagesWithUrls)
+        palmDescriptions = await extractPalmistryData(imagesWithUrls)
+        console.log('[API] ✅ Palmistry extraction complete')
       } catch (error) {
-        console.error('Error analyzing palm images:', error)
+        console.error('[API] Error extracting palmistry data:', error)
         // Continue without palm descriptions if analysis fails
       }
     }
@@ -225,7 +229,7 @@ USER QUESTION: ${userQuestion}
 Answer ONLY what the user asked. Keep it short (4-6 sentences), direct, and conversational. NO greetings, NO closing lines, NO disclaimers, NO extra advice. Just answer the question naturally based on their birth details and palm reading.`
 
       console.log(`📝 Sending message with context (${userContextText.length} chars of context)`)
-      
+
       const response = await anythingLLMService.chat(
         workspace.workspace_id,
         messageWithContext, // Message with context prepended
@@ -233,7 +237,7 @@ Answer ONLY what the user asked. Keep it short (4-6 sentences), direct, and conv
         chatHistory.slice(-20) // Last 20 messages
       )
 
-      answerText = response.response ||''
+      answerText = response.response || ''
       // Extract model info if available
       llmModelUsed = (response as any).model || 'anythingllm'
       tokensUsed = (response as any).tokens || 0
@@ -248,7 +252,7 @@ Answer ONLY what the user asked. Keep it short (4-6 sentences), direct, and conv
       }
     } catch (error) {
       console.error('Error calling AnythingLLM:', error)
-      
+
       // If workspace is invalid, return error (workspace should only be created on registration)
       if (error instanceof Error && (error.message.includes('not a valid workspace') || error.message.includes('recreate workspace') || error.message.includes('Invalid workspace ID'))) {
         return createErrorResponse(
@@ -371,18 +375,18 @@ Answer ONLY what the user asked. Keep it short (4-6 sentences), direct, and conv
         userName,
         userEmail,
         question: question.text_original,
-            answer: (planType === 'flame' || planType === 'superflame') ? '' : answerTextTranslated, // No full answer for Flame/SuperFlame plans
+        answer: (planType === 'flame' || planType === 'superflame') ? '' : answerTextTranslated, // No full answer for Flame/SuperFlame plans
         planType,
         audioUrl,
         questionId: question.id,
         answerId: answer.id,
       }, deliveryDelay)
       console.log(`✅ Email scheduled for delivery in ${deliveryDelay} hours (${Math.round(deliveryDelay * 60)} minutes)`)
-      
+
       // For all plans, rely on cron job to send at scheduled time
       // Gmail provider ab bhi delays respect karega
       const isTestMode = process.env.EMAIL_TEST_MODE === 'true'
-      
+
       if (isTestMode) {
         console.log(`🧪 Test mode: Email will be sent immediately for ${planType} plan`)
       } else {
@@ -412,13 +416,13 @@ Answer ONLY what the user asked. Keep it short (4-6 sentences), direct, and conv
         max: quotaStatus.max,
       },
       emailScheduled: true,
-      deliveryTime: deliveryDelay === 5 / 60 
-        ? 'within 5 minutes' 
-        : deliveryDelay === 1 
-        ? 'within 1 hour' 
-        : deliveryDelay === 24
-        ? 'after 24 hours'
-        : `in ${Math.round(deliveryDelay * 60)} minutes`,
+      deliveryTime: deliveryDelay === 5 / 60
+        ? 'within 5 minutes'
+        : deliveryDelay === 1
+          ? 'within 1 hour'
+          : deliveryDelay === 24
+            ? 'after 24 hours'
+            : `in ${Math.round(deliveryDelay * 60)} minutes`,
     })
   } catch (error) {
     console.error('Error in POST /api/questions/answer:', error)

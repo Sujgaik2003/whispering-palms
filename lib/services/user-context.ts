@@ -4,6 +4,8 @@
  */
 
 import { createClient } from '@/lib/supabase/server'
+import { extractPalmFeatures } from './palm-extractor'
+import { interpretPalmistry, formatPalmistryForLLM, type PalmistryFeatures } from './palmistry-interpreter'
 
 export interface UserContext {
   // Basic user information
@@ -12,14 +14,14 @@ export interface UserContext {
   country?: string
   preferredLanguage: string
   timezone?: string
-  
+
   // Birth details
   dateOfBirth?: string
   timeOfBirth?: string
   placeOfBirth?: string
   birthTimezone?: string
   astropalmProfileText?: string
-  
+
   // Palm images
   palmImages: PalmImage[]
 }
@@ -144,6 +146,92 @@ export async function generateImageSignedUrls(
 }
 
 /**
+ * Extract structured palmistry data from palm images
+ * This is the CRITICAL function that was missing - it converts images to palmistry features
+ * 
+ * Returns Map<palmType, palmistryText>
+ * NOW WITH PROPER ERROR HANDLING - no fake fallback text
+ */
+export async function extractPalmistryData(
+  images: PalmImage[]
+): Promise<Map<string, string>> {
+  if (images.length === 0) {
+    return new Map()
+  }
+
+  console.log('[Palmistry] Starting extraction for', images.length, 'palm images')
+
+  // Filter images that have signed URLs
+  const imagesWithUrls = images.filter((img) => img.signedUrl)
+
+  if (imagesWithUrls.length === 0) {
+    console.warn('[Palmistry] No palm images with signed URLs available')
+    return new Map()
+  }
+
+  // Track successful and failed extractions
+  const successfulExtractions: Array<{ palmType: string; palmistryText: string }> = []
+  const failedPalms: string[] = []
+
+  // Extract features and interpret palmistry for all images
+  for (const image of imagesWithUrls) {
+    try {
+      console.log(`[Palmistry] Processing ${image.palmType}...`)
+
+      // Step 1: Extract geometric features from image
+      // This will throw PALM_DETECTION_FAILED if hand detection fails
+      const geometricFeatures = await extractPalmFeatures(image.signedUrl!, image.palmType)
+
+      // Step 2: Interpret geometric features as palmistry data
+      const palmistryFeatures = interpretPalmistry(geometricFeatures, image.palmType)
+
+      // Step 3: Format for LLM
+      const palmistryText = formatPalmistryForLLM(palmistryFeatures, image.palmType)
+
+      console.log(`[Palmistry] ✓ ${image.palmType} analyzed successfully`)
+      console.log(`[Palmistry] Confidence: ${palmistryFeatures.confidence}`)
+      console.log(`[Palmistry] Palm shape: ${palmistryFeatures.palmShape}`)
+      if (palmistryFeatures.majorLines.marriageLines) {
+        console.log(`[Palmistry] Marriage line: ${palmistryFeatures.majorLines.marriageLines.position} position`)
+      }
+
+      successfulExtractions.push({ palmType: image.palmType, palmistryText })
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+
+      // Check if this is a palm detection failure
+      if (errorMessage.includes('PALM_DETECTION_FAILED')) {
+        console.error(`[Palmistry] ❌ DETECTION FAILED for ${image.palmType}`)
+        console.error(`[Palmistry] Reason: Hand landmarks not detected - image quality insufficient`)
+        failedPalms.push(image.palmType)
+      } else {
+        // Other errors (network, processing, etc.)
+        console.error(`[Palmistry] ❌ ERROR processing ${image.palmType}:`, errorMessage)
+        failedPalms.push(image.palmType)
+      }
+
+      // DO NOT add fake fallback text - just skip this palm
+    }
+  }
+
+  // Convert successful extractions to Map
+  const palmistryMap = new Map<string, string>()
+  successfulExtractions.forEach(({ palmType, palmistryText }) => {
+    palmistryMap.set(palmType, palmistryText)
+  })
+
+  // Log results
+  if (failedPalms.length > 0) {
+    console.warn('[Palmistry] ⚠️ Failed to extract from:', failedPalms.join(', '))
+    console.warn('[Palmistry] User should be prompted to re-upload clearer images')
+  }
+
+  console.log(`[Palmistry] Extraction complete. Success: ${successfulExtractions.length} / Failed: ${failedPalms.length}`)
+
+  return palmistryMap
+}
+
+/**
  * Format user context into structured text for LLM prompt
  */
 export function formatUserContextForLLM(
@@ -216,7 +304,7 @@ export function formatUserContextForLLM(
   // Palm Reading Information Section
   if (palmDescriptions && (palmDescriptions instanceof Map ? palmDescriptions.size > 0 : palmDescriptions.length > 0)) {
     sections.push('PALM READING INFORMATION')
-    
+
     if (palmDescriptions instanceof Map) {
       // Map format: key = palmType, value = description
       for (const [palmType, description] of palmDescriptions.entries()) {
@@ -232,17 +320,28 @@ export function formatUserContextForLLM(
     }
     sections.push('')
   } else if (context.palmImages.length > 0) {
+    // Palm images were uploaded but analysis failed
     sections.push('PALM READING INFORMATION')
-    sections.push(
-      `User has uploaded ${context.palmImages.length} palm image(s): ${context.palmImages.map((p) => p.palmType).join(', ')}. Palm images are available for analysis.`
-    )
+    sections.push(`User has uploaded ${context.palmImages.length} palm image(s), but detailed palm analysis is not currently available.`)
+    sections.push('')
+    sections.push('NOTE FOR ASTROLOGER:')
+    sections.push('- Focus on birth chart and Vedic astrology for this reading')
+    sections.push('- If user asks about palm-specific predictions (marriage timing from palm, career from palm lines, etc.):')
+    sections.push('  * Politely inform them that clearer palm images are needed for accurate palm reading')
+    sections.push('  * Suggest they upload new photos with:')
+    sections.push('    - Good lighting (natural daylight preferred)')
+    sections.push('    - Palm facing camera directly')
+    sections.push('    - Fingers spread open')
+    sections.push('    - Full palm visible from wrist to fingertips')
+    sections.push('  * Continue with birth chart-based predictions instead')
+    sections.push('  * DO NOT apologize excessively - be matter-of-fact')
     sections.push('')
   }
 
   // Footer
   sections.push('---')
   sections.push(
-    'Note for AI: Use this information to provide personalized astrological and palm reading insights. When answering questions, reference the user\'s birth details, birth chart summary, and palm reading information when relevant.'
+    'Note for AI: Use the available information to provide personalized astrological insights. When birth chart data is available, prioritize Vedic astrology analysis. If palm reading data is unavailable, focus on birth chart interpretations.'
   )
 
   return sections.join('\n')
