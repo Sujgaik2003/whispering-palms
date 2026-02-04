@@ -273,4 +273,21 @@ export default {
   'plan.unlimitedQuestions': '1日あたりの質問無制限',
   'plan.alreadyOnPlan': '現在利用中のプラン:',
   'plan.plan': 'プラン',
+
+  // Daily Horoscope
+  'horoscope.dailyHoroscope': '今日の運勢',
+  'horoscope.luckyNumber': 'ラッキーナンバー',
+  'horoscope.luckyColor': 'ラッキーカラー',
+  'horoscope.luckyTime': 'ラッキータイム',
+  'horoscope.mood': '気分',
+  'horoscope.bestCompatibility': '今日の相性ベスト',
+  'horoscope.updatedAt': '更新',
+  'horoscope.refresh': '更新する',
+  'horoscope.loading': '星を読んでいます...',
+  'horoscope.error': '運勢を読み込めませんでした',
+  'horoscope.tryAgain': '再試行',
+
+  // Common extras
+  'common.readMore': '続きを読む',
+  'common.showLess': '閉じる',
 } as const

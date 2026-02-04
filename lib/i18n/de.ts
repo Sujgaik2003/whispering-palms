@@ -270,4 +270,21 @@ export default {
   'plan.unlimitedQuestions': 'Unbegrenzte Fragen pro Tag',
   'plan.alreadyOnPlan': 'Sie sind bereits auf dem',
   'plan.plan': 'Plan',
+
+  // Daily Horoscope
+  'horoscope.dailyHoroscope': 'Tageshoroskop',
+  'horoscope.luckyNumber': 'Glückszahl',
+  'horoscope.luckyColor': 'Glücksfarbe',
+  'horoscope.luckyTime': 'Glückszeit',
+  'horoscope.mood': 'Stimmung',
+  'horoscope.bestCompatibility': 'Beste Kompatibilität heute',
+  'horoscope.updatedAt': 'Aktualisiert',
+  'horoscope.refresh': 'Aktualisieren',
+  'horoscope.loading': 'Lese die Sterne...',
+  'horoscope.error': 'Horoskop konnte nicht geladen werden',
+  'horoscope.tryAgain': 'Erneut versuchen',
+
+  // Common extras
+  'common.readMore': 'Mehr lesen',
+  'common.showLess': 'Weniger anzeigen',
 } as const

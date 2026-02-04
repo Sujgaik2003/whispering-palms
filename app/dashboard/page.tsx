@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import WhisperingPalmsLogo from '@/app/components/Logo'
 import PalmMatchingStatus from '@/app/components/PalmMatchingStatus'
+import DailyHoroscope from '@/app/components/DailyHoroscope'
 import LanguageSwitcher from '@/app/components/LanguageSwitcher'
 import { useI18n } from '@/app/hooks/useI18n'
 
@@ -520,6 +521,11 @@ export default function DashboardPage() {
             <div className={`min-h-[180px] transition-all duration-700 delay-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
               <PalmMatchingStatus />
             </div>
+          </div>
+
+          {/* Daily Horoscope Section - Full Width */}
+          <div className={`mt-6 sm:mt-8 transition-all duration-700 delay-[800ms] ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+            <DailyHoroscope />
           </div>
         </div>
       </div>

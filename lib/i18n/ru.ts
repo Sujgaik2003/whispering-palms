@@ -273,4 +273,21 @@ export default {
   'plan.unlimitedQuestions': 'Безлимитные вопросы в день',
   'plan.alreadyOnPlan': 'Вы уже используете план',
   'plan.plan': '',
+
+  // Daily Horoscope
+  'horoscope.dailyHoroscope': 'Ежедневный гороскоп',
+  'horoscope.luckyNumber': 'Счастливое число',
+  'horoscope.luckyColor': 'Счастливый цвет',
+  'horoscope.luckyTime': 'Счастливое время',
+  'horoscope.mood': 'Настроение',
+  'horoscope.bestCompatibility': 'Лучшая совместимость сегодня',
+  'horoscope.updatedAt': 'Обновлено',
+  'horoscope.refresh': 'Обновить',
+  'horoscope.loading': 'Читаем звёзды...',
+  'horoscope.error': 'Не удалось загрузить гороскоп',
+  'horoscope.tryAgain': 'Попробовать снова',
+
+  // Common extras
+  'common.readMore': 'Читать далее',
+  'common.showLess': 'Показать меньше',
 } as const
