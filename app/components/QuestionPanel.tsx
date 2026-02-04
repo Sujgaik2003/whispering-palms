@@ -1,5 +1,6 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import Toast from './Toast'
 import { useI18n } from '@/app/hooks/useI18n'
@@ -22,6 +23,7 @@ interface Question {
 }
 
 export default function QuestionPanel() {
+  const router = useRouter()
   const { t, renderKey } = useI18n() // i18n hook for translations
   const [input, setInput] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -209,53 +211,79 @@ export default function QuestionPanel() {
       {quota && (
         <div className="bg-white/60 backdrop-blur-lg border-b border-beige-300/50 p-4">
           <div className="max-w-4xl mx-auto px-3 sm:px-4">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0 text-xs sm:text-sm mb-2">
-                <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-                  <span className="text-text-secondary">
-                    {t('common.dailyQuota')}: {quota.max === -1 ? t('common.unlimited') : `${quota.used} / ${quota.max}`}
-                  </span>
-                  <button
-                    onClick={loadQuota}
-                    className="p-1 sm:p-1.5 text-text-tertiary hover:text-text-primary hover:bg-beige-100 rounded-lg transition-all flex-shrink-0"
-                    title="Refresh quota"
-                  >
-                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                  </button>
-                </div>
-                <span
-                  className={`font-semibold text-xs sm:text-sm ${
-                    quota.max === -1
-                      ? 'text-purple-600'
-                      : quota.remaining === 0
-                      ? 'text-red-500'
-                      : quota.remaining <= 1
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0 text-xs sm:text-sm mb-2">
+              <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+                <span className="text-text-secondary">
+                  {t('common.dailyQuota')}: {quota.max === -1 ? t('common.unlimited') : `${quota.used} / ${quota.max}`}
+                </span>
+                <button
+                  onClick={loadQuota}
+                  className="p-1 sm:p-1.5 text-text-tertiary hover:text-text-primary hover:bg-beige-100 rounded-lg transition-all flex-shrink-0"
+                  title="Refresh quota"
+                >
+                  <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                </button>
+              </div>
+              <span
+                className={`font-semibold text-xs sm:text-sm ${quota.max === -1
+                  ? 'text-purple-600'
+                  : quota.remaining === 0
+                    ? 'text-red-500'
+                    : quota.remaining <= 1
                       ? 'text-yellow-500'
                       : 'text-green-600'
                   }`}
-                >
-                  {quota.max === -1 ? t('common.unlimited') : `${quota.remaining} ${t('common.remaining')}`}
-                </span>
-              </div>
+              >
+                {quota.max === -1 ? t('common.unlimited') : `${quota.remaining} ${t('common.remaining')}`}
+              </span>
+            </div>
             {quota.max !== -1 && (
               <>
                 <div className="w-full bg-beige-200 rounded-full h-2">
                   <div
-                    className={`h-2 rounded-full transition-all ${
-                      quota.percentage >= 100
-                        ? 'bg-red-500'
-                        : quota.percentage >= 80
+                    className={`h-2 rounded-full transition-all ${quota.percentage >= 100
+                      ? 'bg-red-500'
+                      : quota.percentage >= 80
                         ? 'bg-yellow-500'
                         : 'bg-green-500'
-                    }`}
+                      }`}
                     style={{ width: `${Math.min(quota.percentage, 100)}%` }}
                   />
                 </div>
                 {quota.remaining === 0 && (
-                  <p className="text-red-600 text-xs mt-2">
-                    Daily quota exhausted. Quota will reset at {new Date(quota.resetAt).toLocaleTimeString()}
-                  </p>
+                  <div className="mt-3 p-3 bg-gradient-to-br from-red-50 to-orange-50 border border-red-100 rounded-xl">
+                    <p className="text-red-800 text-xs sm:text-sm font-medium mb-2 flex items-center gap-2">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Daily limit reached
+                    </p>
+                    <p className="text-text-secondary text-xs mb-3">
+                      You've used all your questions for today. Upgrade your plan to ask more now!
+                    </p>
+                    <button
+                      onClick={() => router.push('/subscription')}
+                      type="button"
+                      className="w-full py-2 px-3 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white text-xs sm:text-sm rounded-lg font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 mb-2"
+                    >
+                      <span className="text-lg">✨</span>
+                      Upgrade Limit & Ask More
+                    </button>
+                    <div className="text-center">
+                      <button
+                        onClick={() => router.push('/subscription')}
+                        className="text-[10px] sm:text-xs text-text-tertiary hover:text-text-primary underline decoration-dotted transition-colors"
+                      >
+                        Manage Subscription
+                      </button>
+                      <span className="text-[10px] text-text-tertiary mx-2">•</span>
+                      <span className="text-[10px] text-text-tertiary">
+                        Resets at {new Date(quota.resetAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
+                  </div>
                 )}
               </>
             )}
@@ -311,7 +339,7 @@ export default function QuestionPanel() {
                 <div className="mb-2 sm:mb-3">
                   <p className="text-text-secondary text-sm sm:text-base break-words">{question.text_original}</p>
                 </div>
-                
+
                 {/* Status Display */}
                 <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-beige-200">
                   {question.status === 'pending' ? (
@@ -343,7 +371,7 @@ export default function QuestionPanel() {
                     </div>
                   )}
                 </div>
-                
+
                 <p className="text-text-tertiary text-[10px] sm:text-xs mt-2 sm:mt-3">
                   Asked on {new Date(question.created_at).toLocaleString()}
                 </p>

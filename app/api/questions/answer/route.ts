@@ -55,6 +55,21 @@ export async function POST(request: NextRequest) {
       return createErrorResponse('Question not found', 404)
     }
 
+    // Check quota before processing
+    // This prevents using LLM resources if user has no quota
+    const quotaValidation = await quotaService.validateQuota(user.id, planType)
+    if (!quotaValidation.valid) {
+      return createErrorResponse(
+        quotaValidation.message || 'Daily quota exhausted',
+        403,
+        {
+          code: 'QUOTA_EXHAUSTED',
+          remaining: 0,
+          resetAt: (await quotaService.getDailyQuota(user.id, planType)).reset_at
+        }
+      )
+    }
+
     // Check if answer already exists
     const { data: existingAnswer } = await supabase
       .from('answers')
@@ -189,6 +204,8 @@ export async function POST(request: NextRequest) {
 
     // Generate answer using AnythingLLM
     let answerText = ''
+    let answerTextInternalEn = ''
+    let answerTextTranslated = ''
     let llmModelUsed = 'unknown'
     let tokensUsed = 0
 
@@ -220,13 +237,37 @@ Remember: Answer the question directly, concisely, and naturally - like a palmis
       // Inject user context directly into the message for better reliability
       // Some LLM modes don't properly use system prompts, so we prepend context to message
       const userQuestion = question.text_original || question.text_internal_en || ''
+      const questionLanguage = question.language_detected || 'en'
+      const targetLanguageName = questionLanguage === 'hi' ? 'Hindi' :
+        questionLanguage === 'es' ? 'Spanish' :
+          questionLanguage === 'fr' ? 'French' :
+            questionLanguage === 'de' ? 'German' :
+              questionLanguage === 'it' ? 'Italian' :
+                'the user\'s language'
+
       const messageWithContext = `USER CONTEXT INFORMATION:
 ${userContextText}
 
 ---
 USER QUESTION: ${userQuestion}
 
-Answer ONLY what the user asked. Keep it short (4-6 sentences), direct, and conversational. NO greetings, NO closing lines, NO disclaimers, NO extra advice. Just answer the question naturally based on their birth details and palm reading.`
+INSTRUCTIONS:
+1. Answer the question based on the user's birth details and palmistry data.
+2. You MUST provide the answer in TWO formats if the user is not asking in English:
+   - First in ENGLISH (for our voice generator)
+   - Second in ${targetLanguageName.toUpperCase()} (for the user to read)
+
+3. Format your response strictly like this:
+[ENGLISH_START]
+(Write the English answer here. Keep it 4-6 sentences, conversational, no greetings)
+[ENGLISH_END]
+
+[LOCAL_START]
+(Write the ${targetLanguageName} translation here. Keep it 4-6 sentences, conversational, no greetings)
+[LOCAL_END]
+
+If the user asks in English or you cannot translate, just provide the English answer inside [ENGLISH_START]...[ENGLISH_END] and [LOCAL_START]...[LOCAL_END] (same content).
+`
 
       console.log(`📝 Sending message with context (${userContextText.length} chars of context)`)
 
@@ -237,7 +278,30 @@ Answer ONLY what the user asked. Keep it short (4-6 sentences), direct, and conv
         chatHistory.slice(-20) // Last 20 messages
       )
 
-      answerText = response.response || ''
+      const rawResponse = response.response || ''
+
+      // Extract English and Local versions
+      const englishMatch = rawResponse.match(/\[ENGLISH_START\]([\s\S]*?)\[ENGLISH_END\]/i)
+      const localMatch = rawResponse.match(/\[LOCAL_START\]([\s\S]*?)\[LOCAL_END\]/i)
+
+      if (englishMatch && englishMatch[1]) {
+        answerTextInternalEn = englishMatch[1].trim()
+      } else {
+        // Fallback: If no tags, assume the whole text is the answer (might be mixed language)
+        // We'll try to use it for English voice if it looks like English, but safely just use it
+        answerTextInternalEn = rawResponse.trim()
+      }
+
+      if (localMatch && localMatch[1]) {
+        answerTextTranslated = localMatch[1].trim()
+      } else {
+        // Fallback: If we have En but no Local, use En. If neither, use raw.
+        answerTextTranslated = answerTextInternalEn || rawResponse.trim()
+      }
+
+      // If we only got one (e.g. model forgot Local), ensure we have something
+      if (!answerTextTranslated) answerTextTranslated = answerTextInternalEn
+
       // Extract model info if available
       llmModelUsed = (response as any).model || 'anythingllm'
       tokensUsed = (response as any).tokens || 0
@@ -274,43 +338,29 @@ Answer ONLY what the user asked. Keep it short (4-6 sentences), direct, and conv
       }
     }
 
-    if (!answerText || answerText.trim().length === 0) {
-      return createErrorResponse('Failed to generate answer', 500)
+    if (!answerTextTranslated || answerTextTranslated.trim().length === 0) {
+      answerTextTranslated = "I apologize, I couldn't generate a clear answer. Please try again."
+      answerTextInternalEn = "I apologize, I couldn't generate a clear answer. Please try again."
     }
 
-    // Clean up answer: Remove any greetings, signatures, disclaimers, or closing phrases
-    answerText = answerText
-      // Remove greetings at start
+    // Clean up answers (remove greetings etc from both versions)
+    const cleanText = (text: string) => text
       .replace(/^(Dear\s+[^,\n]+|Hello\s+[^,\n]+|Hi\s+[^,\n]+|Greetings\s*[,\n])/i, '')
-      // Remove closing signatures and phrases
       .replace(/\n*(Best regards|Sincerely|Regards|Thank you|Thanks|Yours truly|Yours sincerely|Assistant Name|Aarav Dev|\[Assistant Name\]|\[Your Name\]).*$/i, '')
       .replace(/\n*---\s*\n*(Best regards|Sincerely|Regards|Thank you|Thanks).*$/i, '')
       .replace(/\n*^(Best regards|Sincerely|Regards|Thank you|Thanks|Assistant Name|\[Assistant Name\]).*$/im, '')
-      // Remove common disclaimers
       .replace(/\n*(For more (detailed|accurate|precise) (analysis|guidance|consultation|reading),?\s*(please\s+)?(consult|see|visit|contact)\s+(a\s+)?(professional|expert|qualified)\s+(astrologer|palmist|palmistry expert|practitioner).*?)/i, '')
       .replace(/\n*(This is (just|only|merely) (a|an) (guidance|general|basic) (reading|analysis|prediction|insight).*?)/i, '')
       .replace(/\n*(Please note that.*?(consult|professional|expert).*?)/i, '')
       .replace(/\n*(For (better|more) (accuracy|precision|details).*?(consult|professional|expert).*?)/i, '')
       .trim()
 
-    // Translate answer to user's language (if not English)
-    const questionLanguage = question.language_detected || 'en'
-    let answerTextTranslated = answerText
-    let answerTextInternalEn = answerText
+    // Apply cleaning
+    answerTextInternalEn = cleanText(answerTextInternalEn)
+    answerTextTranslated = cleanText(answerTextTranslated)
 
-    if (questionLanguage !== 'en') {
-      // Answer is in English, translate to user's language
-      answerTextTranslated = await translationService.translateToLanguage(
-        answerText,
-        questionLanguage,
-        'en'
-      )
-      answerTextInternalEn = answerText // Keep English version
-    } else {
-      // Answer is already in English
-      answerTextInternalEn = answerText
-      answerTextTranslated = answerText
-    }
+    // For database compatibility (redundant assignment but clearer flow)
+    answerText = answerTextInternalEn
 
     // Save answer to database
     const { data: answer, error: answerError } = await supabase
@@ -356,9 +406,34 @@ Answer ONLY what the user asked. Keep it short (4-6 sentences), direct, and conv
           console.warn('⚠️ VoiceRSS API key is not configured. Voice generation will be skipped. Email will be sent without audio.')
           console.warn('💡 To enable voice: Set VOICE_RSS_API_KEY in your .env.local file')
         } else {
-          // Generate audio URL using VoiceRSS API
-          audioUrl = await voiceRSSTTSService.generateSpeechUrlAsync(answerTextInternalEn)
-          console.log('✅ Voice generated for Flame plan using VoiceRSS:', audioUrl)
+          // Determine VoiceRSS language code based on question language
+          // Map: simple code -> VoiceRSS/BCP-47 locale
+          const langMap: Record<string, string> = {
+            'en': 'en-us',
+            'hi': 'hi-in',
+            'es': 'es-es',
+            'fr': 'fr-fr',
+            'de': 'de-de',
+            'it': 'it-it',
+            'pt': 'pt-pt',
+            'ru': 'ru-ru',
+            'ja': 'ja-jp',
+            'ko': 'ko-kr',
+            'zh': 'zh-cn',
+            'ar': 'ar-sa'
+          }
+
+
+          const questionLanguage = question.language_detected || 'en'
+          const voiceLanguage = langMap[questionLanguage] || 'en-us'
+
+          // Use the TRANSLATED text for the voice (since user requested avatar to speak in that language)
+          // If translation is empty (shouldn't be), fallback to English
+          const textToSpeak = answerTextTranslated || answerTextInternalEn
+
+          // Generate audio URL using VoiceRSS API with specific language
+          audioUrl = await voiceRSSTTSService.generateSpeechUrlAsync(textToSpeak, voiceLanguage)
+          console.log(`✅ Voice generated for Flame plan using VoiceRSS (Lang: ${voiceLanguage}):`, audioUrl)
         }
       } catch (error) {
         console.error('❌ Error generating voice for Flame plan:', error)

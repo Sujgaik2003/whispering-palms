@@ -38,7 +38,7 @@ class VoiceRSSTTSService {
    * @param text Text to convert to speech
    * @returns URL to the generated audio file
    */
-  generateSpeechUrl(text: string): string {
+  generateSpeechUrl(text: string, language?: string): string {
     if (!this.isAvailable()) {
       throw new Error(
         'VoiceRSS API key is not configured. Please set VOICE_RSS_API_KEY in your environment variables.'
@@ -58,7 +58,7 @@ class VoiceRSSTTSService {
     // VoiceRSS has a character limit (usually 100KB or ~10,000 characters)
     // Truncate if necessary
     const maxLength = 10000
-    const truncatedText = cleanedText.length > maxLength 
+    const truncatedText = cleanedText.length > maxLength
       ? cleanedText.substring(0, maxLength) + '...'
       : cleanedText
 
@@ -67,7 +67,7 @@ class VoiceRSSTTSService {
     const baseUrl = 'http://api.voicerss.org/'
     const params = new URLSearchParams({
       key: this.config.apiKey,
-      hl: this.config.language,
+      hl: language || this.config.language, // Use provided language or default
       c: 'MP3', // Codec
       f: '16khz_16bit_stereo', // Format: 16kHz, 16-bit, stereo
       src: truncatedText,
@@ -84,15 +84,15 @@ class VoiceRSSTTSService {
     }
 
     const audioUrl = `${baseUrl}?${params.toString()}`
-    
+
     return audioUrl
   }
 
   /**
    * Generate speech URL (alias for generateSpeechUrl for consistency)
    */
-  async generateSpeechUrlAsync(text: string): Promise<string> {
-    return this.generateSpeechUrl(text)
+  async generateSpeechUrlAsync(text: string, language?: string): Promise<string> {
+    return this.generateSpeechUrl(text, language)
   }
 }
 

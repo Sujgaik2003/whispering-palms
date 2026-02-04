@@ -16,9 +16,16 @@ import hi from './hi'
 import es from './es'
 import fr from './fr'
 import de from './de'
+import it from './it'
+import pt from './pt'
+import ru from './ru'
+import ja from './ja'
+import ko from './ko'
+import zh from './zh'
+import ar from './ar'
 
 // RTL languages (add language codes here when adding RTL support)
-const RTL_LANGUAGES: string[] = [] // Currently none, but can add: 'ar', 'he', 'ur', 'fa'
+const RTL_LANGUAGES: string[] = ['ar'] // Currently none, but can add: 'ar', 'he', 'ur', 'fa'
 
 export type TranslationKey = keyof typeof en
 
@@ -34,6 +41,13 @@ export const dictionaries: Record<string, Dictionary> = {
   es,
   fr,
   de,
+  it,
+  pt,
+  ru,
+  ja,
+  ko,
+  zh,
+  ar,
 }
 
 /**
