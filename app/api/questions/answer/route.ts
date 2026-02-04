@@ -12,7 +12,8 @@ import {
   extractPalmistryData, // 🔥 NEW: Extract actual palmistry features instead of generic vision labels
 } from '@/lib/services/user-context'
 import { scheduleEmailDelivery, getDeliveryDelay, generateAnswerEmail } from '@/lib/services/email'
-import { voiceRSSTTSService } from '@/lib/services/voicerss-tts'
+import { googleTTSService } from '@/lib/services/google-tts'
+import { voiceRSSTTSService } from '@/lib/services/voicerss-tts' // Fallback for English
 
 /**
  * POST /api/questions/answer
@@ -387,61 +388,63 @@ If the user asks in English or you cannot translate, just provide the English an
     // Keep question status as 'pending' until email is sent
     // Status will be updated to 'sent' when email is delivered via /api/email/send
 
-    // Get user email
+    // Get user email and preferred language
     const { data: userData } = await supabase
       .from('users')
-      .select('email, name')
+      .select('email, name, preferred_language')
       .eq('id', user.id)
       .single()
 
     const userEmail = userData?.email || ''
     const userName = userData?.name || undefined
+    const userPreferredLanguage = userData?.preferred_language || 'en'
 
-    // Generate voice for Flame and SuperFlame plans using VoiceRSS
+    // Generate voice for Flame and SuperFlame plans using Google Cloud TTS
+    // Google TTS supports ALL languages: Hindi, Arabic, Russian, Chinese, Korean, etc.
+    // IMPORTANT: Use user's PREFERRED LANGUAGE from settings, not the detected question language
     let audioUrl: string | undefined
     if (planType === 'flame' || planType === 'superflame') {
       try {
-        // Check if VoiceRSS is configured
-        if (!voiceRSSTTSService.isAvailable()) {
-          console.warn('⚠️ VoiceRSS API key is not configured. Voice generation will be skipped. Email will be sent without audio.')
-          console.warn('💡 To enable voice: Set VOICE_RSS_API_KEY in your .env.local file')
-        } else {
-          // Determine VoiceRSS language code based on question language
-          // Map: simple code -> VoiceRSS/BCP-47 locale
-          const langMap: Record<string, string> = {
-            'en': 'en-us',
-            'hi': 'hi-in',
-            'es': 'es-es',
-            'fr': 'fr-fr',
-            'de': 'de-de',
-            'it': 'it-it',
-            'pt': 'pt-pt',
-            'ru': 'ru-ru',
-            'ja': 'ja-jp',
-            'ko': 'ko-kr',
-            'zh': 'zh-cn',
-            'ar': 'ar-sa'
+        // Use user's preferred language for voice narration
+        const voiceLanguage = userPreferredLanguage || 'en'
+        const textToSpeak = answerTextTranslated || answerTextInternalEn
+
+        console.log(`🎤 Voice narration language: ${voiceLanguage} (user preference)`)
+
+        // Primary: Use Google Cloud TTS (supports all languages)
+        if (googleTTSService.isAvailable()) {
+          console.log(`🎤 Using Google Cloud TTS for language: ${voiceLanguage}`)
+
+          // Check if language is supported by Google TTS
+          if (googleTTSService.isLanguageSupported(voiceLanguage)) {
+            // Generate audio file and get URL
+            audioUrl = await googleTTSService.generateSpeechFile(textToSpeak, voiceLanguage)
+            console.log(`✅ Voice generated using Google Cloud TTS (Lang: ${voiceLanguage}):`, audioUrl)
+          } else {
+            // Language not supported, use English
+            console.warn(`⚠️ Language ${voiceLanguage} not supported by Google TTS, using English`)
+            audioUrl = await googleTTSService.generateSpeechFile(textToSpeak, 'en')
+            console.log(`✅ Voice generated in English fallback:`, audioUrl)
           }
-
-
-          const questionLanguage = question.language_detected || 'en'
-          const voiceLanguage = langMap[questionLanguage] || 'en-us'
-
-          // Use the TRANSLATED text for the voice (since user requested avatar to speak in that language)
-          // If translation is empty (shouldn't be), fallback to English
-          const textToSpeak = answerTextTranslated || answerTextInternalEn
-
-          // Generate audio URL using VoiceRSS API with specific language
-          audioUrl = await voiceRSSTTSService.generateSpeechUrlAsync(textToSpeak, voiceLanguage)
-          console.log(`✅ Voice generated for Flame plan using VoiceRSS (Lang: ${voiceLanguage}):`, audioUrl)
+        }
+        // Fallback: Use VoiceRSS for English if Google TTS is not available
+        else if (voiceRSSTTSService.isAvailable() && voiceLanguage === 'en') {
+          console.log(`🎤 Using VoiceRSS fallback for English`)
+          audioUrl = await voiceRSSTTSService.generateSpeechUrlAsync(textToSpeak, 'en-us')
+          console.log(`✅ Voice generated using VoiceRSS (English only):`, audioUrl)
+        } else {
+          console.warn('⚠️ No TTS service configured. Voice generation will be skipped.')
+          console.warn('💡 To enable voice for ALL languages: Set GOOGLE_APPLICATION_CREDENTIALS or GOOGLE_SERVICE_ACCOUNT_JSON')
+          console.warn('💡 For English only fallback: Set VOICE_RSS_API_KEY')
         }
       } catch (error) {
-        console.error('❌ Error generating voice for Flame plan:', error)
+        console.error('❌ Error generating voice for Flame/SuperFlame plan:', error)
         console.warn('⚠️ Continuing without voice - email will be sent without audio')
         // Continue without voice - email will be sent without audio
         audioUrl = undefined
       }
     }
+
 
     // Schedule email delivery
     const deliveryDelay = getDeliveryDelay(planType)
