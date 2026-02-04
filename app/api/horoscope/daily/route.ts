@@ -127,7 +127,7 @@ export async function GET(request: NextRequest) {
             .eq('id', user.id)
             .single()
 
-        const preferredLanguage = userData?.preferred_language || 'en'
+        const preferredLanguage = request.nextUrl.searchParams.get('lang') || userData?.preferred_language || 'en'
         const userName = userData?.name || 'Dear one'
 
         const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD

@@ -46,7 +46,7 @@ export default function DailyHoroscope() {
             setLoading(true)
             setError(null)
 
-            const response = await fetch('/api/horoscope/daily')
+            const response = await fetch(`/api/horoscope/daily?lang=${language}`)
             const result = await response.json()
 
             if (response.ok && result.success) {
