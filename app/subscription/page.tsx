@@ -419,7 +419,7 @@ export default function SubscriptionPage() {
             return (
               <div
                 key={plan.id}
-                className={`group relative bg-white/70 backdrop-blur-md rounded-[2.5rem] p-8 sm:p-10 border-2 transition-all duration-500 shadow-soft-2xl hover:shadow-gold-500/10 hover:-translate-y-4 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                className={`group relative bg-white/70 backdrop-blur-md rounded-[2.5rem] p-6 sm:p-10 xl:p-6 2xl:p-10 border-2 transition-all duration-500 shadow-soft-2xl hover:shadow-gold-500/10 hover:-translate-y-4 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
                   } ${plan.popular ? 'border-gold-400 scale-105 z-20 shadow-soft-2xl' : 'border-beige-200 hover:border-gold-200'}`}
                 style={{
                   transitionDelay: `${200 + index * 100}ms`,
@@ -433,7 +433,7 @@ export default function SubscriptionPage() {
 
                 {/* Popular Badge */}
                 {plan.popular && (
-                  <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-gold-500 via-gold-600 to-gold-500 text-white px-6 py-2 rounded-full text-xs font-black tracking-[0.2em] shadow-soft-lg z-30 uppercase">
+                  <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-gold-500 via-gold-600 to-gold-500 text-white px-6 py-2 rounded-full text-xs font-black tracking-[0.2em] shadow-soft-lg z-30 uppercase whitespace-nowrap">
                     {t('subscription.mostPopular')}
                   </div>
                 )}
@@ -441,13 +441,13 @@ export default function SubscriptionPage() {
                 {/* Content */}
                 <div className="relative z-10 flex flex-col h-full">
                   {/* Icon & Label */}
-                  <div className="flex items-center gap-4 mb-8">
-                    <div className={`p-4 bg-gradient-to-br ${colors.bg} rounded-3xl ${colors.icon} group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-soft-lg flex-shrink-0`}>
-                      <div className="w-8 h-8">{plan.icon}</div>
+                  <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
+                    <div className={`p-3 sm:p-4 bg-gradient-to-br ${colors.bg} rounded-3xl ${colors.icon} group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-soft-lg flex-shrink-0`}>
+                      <div className="w-6 h-6 sm:w-8 sm:h-8">{plan.icon}</div>
                     </div>
-                    <div>
-                      <h3 className="text-3xl font-black text-text-primary font-serif tracking-tight leading-none mb-1">{plan.name}</h3>
-                      <p className="text-text-tertiary text-[10px] font-black uppercase tracking-widest">{plan.id}</p>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-2xl sm:text-3xl xl:text-xl 2xl:text-3xl font-black text-text-primary font-serif tracking-tight leading-none mb-1 break-words">{plan.name}</h3>
+                      <p className="text-text-tertiary text-[10px] font-black uppercase tracking-widest truncate">{plan.id}</p>
                     </div>
                   </div>
 
