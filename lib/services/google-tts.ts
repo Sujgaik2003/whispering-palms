@@ -27,35 +27,37 @@ interface AudioConfig {
 
 // Language to Google Cloud TTS voice mapping
 // Using WaveNet voices for best quality (free tier: 1M chars/month)
+// Language to Google Cloud TTS voice mapping
+// Using WaveNet voices for best quality (free tier: 1M chars/month)
 const LANGUAGE_VOICE_MAP: Record<string, VoiceParams> = {
-    'en': { languageCode: 'en-US', name: 'en-US-Wavenet-D', ssmlGender: 'MALE' },
-    'hi': { languageCode: 'hi-IN', name: 'hi-IN-Wavenet-B', ssmlGender: 'MALE' },
-    'ar': { languageCode: 'ar-XA', name: 'ar-XA-Wavenet-B', ssmlGender: 'MALE' },
-    'ru': { languageCode: 'ru-RU', name: 'ru-RU-Wavenet-B', ssmlGender: 'MALE' },
-    'zh': { languageCode: 'cmn-CN', name: 'cmn-CN-Wavenet-B', ssmlGender: 'MALE' },
-    'ko': { languageCode: 'ko-KR', name: 'ko-KR-Wavenet-C', ssmlGender: 'MALE' },
-    'ja': { languageCode: 'ja-JP', name: 'ja-JP-Wavenet-C', ssmlGender: 'MALE' },
-    'es': { languageCode: 'es-ES', name: 'es-ES-Wavenet-B', ssmlGender: 'MALE' },
-    'fr': { languageCode: 'fr-FR', name: 'fr-FR-Wavenet-B', ssmlGender: 'MALE' },
-    'de': { languageCode: 'de-DE', name: 'de-DE-Wavenet-B', ssmlGender: 'MALE' },
-    'it': { languageCode: 'it-IT', name: 'it-IT-Wavenet-C', ssmlGender: 'MALE' },
-    'pt': { languageCode: 'pt-BR', name: 'pt-BR-Wavenet-B', ssmlGender: 'MALE' },
+    'en': { languageCode: 'en-US', name: 'en-US-Wavenet-C', ssmlGender: 'FEMALE' },
+    'hi': { languageCode: 'hi-IN', name: 'hi-IN-Wavenet-A', ssmlGender: 'FEMALE' },
+    'ar': { languageCode: 'ar-XA', name: 'ar-XA-Wavenet-A', ssmlGender: 'FEMALE' },
+    'ru': { languageCode: 'ru-RU', name: 'ru-RU-Wavenet-A', ssmlGender: 'FEMALE' },
+    'zh': { languageCode: 'cmn-CN', name: 'cmn-CN-Wavenet-A', ssmlGender: 'FEMALE' },
+    'ko': { languageCode: 'ko-KR', name: 'ko-KR-Wavenet-A', ssmlGender: 'FEMALE' },
+    'ja': { languageCode: 'ja-JP', name: 'ja-JP-Wavenet-A', ssmlGender: 'FEMALE' },
+    'es': { languageCode: 'es-ES', name: 'es-ES-Wavenet-A', ssmlGender: 'FEMALE' },
+    'fr': { languageCode: 'fr-FR', name: 'fr-FR-Wavenet-A', ssmlGender: 'FEMALE' },
+    'de': { languageCode: 'de-DE', name: 'de-DE-Wavenet-A', ssmlGender: 'FEMALE' },
+    'it': { languageCode: 'it-IT', name: 'it-IT-Wavenet-A', ssmlGender: 'FEMALE' },
+    'pt': { languageCode: 'pt-BR', name: 'pt-BR-Wavenet-A', ssmlGender: 'FEMALE' },
 }
 
 // Fallback to Standard voices if WaveNet fails (4M chars/month free)
 const LANGUAGE_VOICE_FALLBACK: Record<string, VoiceParams> = {
-    'en': { languageCode: 'en-US', name: 'en-US-Standard-D', ssmlGender: 'MALE' },
-    'hi': { languageCode: 'hi-IN', name: 'hi-IN-Standard-B', ssmlGender: 'MALE' },
-    'ar': { languageCode: 'ar-XA', name: 'ar-XA-Standard-B', ssmlGender: 'MALE' },
-    'ru': { languageCode: 'ru-RU', name: 'ru-RU-Standard-B', ssmlGender: 'MALE' },
-    'zh': { languageCode: 'cmn-CN', name: 'cmn-CN-Standard-B', ssmlGender: 'MALE' },
-    'ko': { languageCode: 'ko-KR', name: 'ko-KR-Standard-C', ssmlGender: 'MALE' },
-    'ja': { languageCode: 'ja-JP', name: 'ja-JP-Standard-C', ssmlGender: 'MALE' },
-    'es': { languageCode: 'es-ES', name: 'es-ES-Standard-B', ssmlGender: 'MALE' },
-    'fr': { languageCode: 'fr-FR', name: 'fr-FR-Standard-B', ssmlGender: 'MALE' },
-    'de': { languageCode: 'de-DE', name: 'de-DE-Standard-B', ssmlGender: 'MALE' },
-    'it': { languageCode: 'it-IT', name: 'it-IT-Standard-C', ssmlGender: 'MALE' },
-    'pt': { languageCode: 'pt-BR', name: 'pt-BR-Standard-B', ssmlGender: 'MALE' },
+    'en': { languageCode: 'en-US', name: 'en-US-Standard-C', ssmlGender: 'FEMALE' },
+    'hi': { languageCode: 'hi-IN', name: 'hi-IN-Standard-A', ssmlGender: 'FEMALE' },
+    'ar': { languageCode: 'ar-XA', name: 'ar-XA-Standard-A', ssmlGender: 'FEMALE' },
+    'ru': { languageCode: 'ru-RU', name: 'ru-RU-Standard-A', ssmlGender: 'FEMALE' },
+    'zh': { languageCode: 'cmn-CN', name: 'cmn-CN-Standard-A', ssmlGender: 'FEMALE' },
+    'ko': { languageCode: 'ko-KR', name: 'ko-KR-Standard-A', ssmlGender: 'FEMALE' },
+    'ja': { languageCode: 'ja-JP', name: 'ja-JP-Standard-A', ssmlGender: 'FEMALE' },
+    'es': { languageCode: 'es-ES', name: 'es-ES-Standard-A', ssmlGender: 'FEMALE' },
+    'fr': { languageCode: 'fr-FR', name: 'fr-FR-Standard-A', ssmlGender: 'FEMALE' },
+    'de': { languageCode: 'de-DE', name: 'de-DE-Standard-A', ssmlGender: 'FEMALE' },
+    'it': { languageCode: 'it-IT', name: 'it-IT-Standard-A', ssmlGender: 'FEMALE' },
+    'pt': { languageCode: 'pt-BR', name: 'pt-BR-Standard-A', ssmlGender: 'FEMALE' },
 }
 
 class GoogleTTSService {
