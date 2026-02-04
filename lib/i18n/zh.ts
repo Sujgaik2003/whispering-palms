@@ -273,4 +273,21 @@ export default {
   'plan.unlimitedQuestions': '每日无限提问',
   'plan.alreadyOnPlan': '您当前在',
   'plan.plan': '计划',
+
+  // Daily Horoscope
+  'horoscope.dailyHoroscope': '每日星座运势',
+  'horoscope.luckyNumber': '幸运数字',
+  'horoscope.luckyColor': '幸运颜色',
+  'horoscope.luckyTime': '幸运时刻',
+  'horoscope.mood': '心情',
+  'horoscope.bestCompatibility': '今日最佳配对',
+  'horoscope.updatedAt': '更新于',
+  'horoscope.refresh': '刷新',
+  'horoscope.loading': '正在解读星象...',
+  'horoscope.error': '无法加载运势',
+  'horoscope.tryAgain': '重试',
+
+  // Common extras
+  'common.readMore': '阅读更多',
+  'common.showLess': '收起',
 } as const

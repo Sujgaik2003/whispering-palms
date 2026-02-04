@@ -273,4 +273,21 @@ export default {
   'plan.unlimitedQuestions': '일일 무제한 질문',
   'plan.alreadyOnPlan': '이미 사용 중인 요금제:',
   'plan.plan': '요금제',
+
+  // Daily Horoscope
+  'horoscope.dailyHoroscope': '오늘의 운세',
+  'horoscope.luckyNumber': '행운의 숫자',
+  'horoscope.luckyColor': '행운의 색상',
+  'horoscope.luckyTime': '행운의 시간',
+  'horoscope.mood': '기분',
+  'horoscope.bestCompatibility': '오늘의 최고 궁합',
+  'horoscope.updatedAt': '업데이트됨',
+  'horoscope.refresh': '새로고침',
+  'horoscope.loading': '별을 읽는 중...',
+  'horoscope.error': '운세를 불러올 수 없습니다',
+  'horoscope.tryAgain': '다시 시도',
+
+  // Common extras
+  'common.readMore': '더 보기',
+  'common.showLess': '접기',
 } as const

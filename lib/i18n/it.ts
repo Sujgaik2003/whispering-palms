@@ -273,4 +273,21 @@ export default {
   'plan.unlimitedQuestions': 'Domande illimitate al giorno',
   'plan.alreadyOnPlan': 'Sei già nel piano',
   'plan.plan': '',
+
+  // Daily Horoscope
+  'horoscope.dailyHoroscope': 'Oroscopo del Giorno',
+  'horoscope.luckyNumber': 'Numero Fortunato',
+  'horoscope.luckyColor': 'Colore Fortunato',
+  'horoscope.luckyTime': 'Ora Fortunata',
+  'horoscope.mood': 'Umore',
+  'horoscope.bestCompatibility': 'Migliore compatibilità oggi',
+  'horoscope.updatedAt': 'Aggiornato',
+  'horoscope.refresh': 'Aggiorna',
+  'horoscope.loading': 'Leggendo le stelle...',
+  'horoscope.error': 'Impossibile caricare l\'oroscopo',
+  'horoscope.tryAgain': 'Riprova',
+
+  // Common extras
+  'common.readMore': 'Leggi di più',
+  'common.showLess': 'Mostra meno',
 } as const

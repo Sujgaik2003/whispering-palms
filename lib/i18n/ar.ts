@@ -273,4 +273,21 @@ export default {
   'plan.unlimitedQuestions': 'أسئلة يومية غير محدودة',
   'plan.alreadyOnPlan': 'أنت مشترك بالفعل في خطة',
   'plan.plan': '',
+
+  // Daily Horoscope
+  'horoscope.dailyHoroscope': 'الأبراج اليومية',
+  'horoscope.luckyNumber': 'الرقم المحظوظ',
+  'horoscope.luckyColor': 'اللون المحظوظ',
+  'horoscope.luckyTime': 'الوقت المحظوظ',
+  'horoscope.mood': 'المزاج',
+  'horoscope.bestCompatibility': 'أفضل توافق اليوم',
+  'horoscope.updatedAt': 'تم التحديث',
+  'horoscope.refresh': 'تحديث',
+  'horoscope.loading': 'قراءة النجوم...',
+  'horoscope.error': 'تعذر تحميل الأبراج',
+  'horoscope.tryAgain': 'حاول مرة أخرى',
+
+  // Common extras
+  'common.readMore': 'اقرأ المزيد',
+  'common.showLess': 'عرض أقل',
 } as const

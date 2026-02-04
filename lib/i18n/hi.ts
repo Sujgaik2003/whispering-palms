@@ -270,4 +270,21 @@ export default {
   'plan.unlimitedQuestions': 'प्रतिदिन असीमित प्रश्न',
   'plan.alreadyOnPlan': 'आप पहले से ही',
   'plan.plan': 'योजना पर हैं',
+
+  // Daily Horoscope
+  'horoscope.dailyHoroscope': 'दैनिक राशिफल',
+  'horoscope.luckyNumber': 'भाग्यशाली अंक',
+  'horoscope.luckyColor': 'भाग्यशाली रंग',
+  'horoscope.luckyTime': 'भाग्यशाली समय',
+  'horoscope.mood': 'मूड',
+  'horoscope.bestCompatibility': 'आज सबसे अच्छी अनुकूलता',
+  'horoscope.updatedAt': 'अपडेट किया गया',
+  'horoscope.refresh': 'रिफ्रेश करें',
+  'horoscope.loading': 'तारों को पढ़ रहे हैं...',
+  'horoscope.error': 'राशिफल लोड नहीं हो सका',
+  'horoscope.tryAgain': 'पुनः प्रयास करें',
+
+  // Common extras
+  'common.readMore': 'और पढ़ें',
+  'common.showLess': 'कम दिखाएं',
 } as const
