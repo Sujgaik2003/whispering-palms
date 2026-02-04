@@ -21,12 +21,13 @@ export function createSuccessResponse<T>(data: T, status: number = 200) {
   )
 }
 
-export function createErrorResponse(message: string, status: number = 500) {
+export function createErrorResponse(message: string, status: number = 500, details?: any) {
   return NextResponse.json(
     {
       success: false,
       error: {
         message,
+        ...details,
       },
     },
     { status }

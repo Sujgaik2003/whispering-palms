@@ -18,6 +18,13 @@ const LANGUAGE_METADATA: Record<string, { name: string; nativeName: string }> = 
   es: { name: 'Spanish', nativeName: 'Español' },
   fr: { name: 'French', nativeName: 'Français' },
   de: { name: 'German', nativeName: 'Deutsch' },
+  it: { name: 'Italian', nativeName: 'Italiano' },
+  pt: { name: 'Portuguese', nativeName: 'Português' },
+  ru: { name: 'Russian', nativeName: 'Русский' },
+  ja: { name: 'Japanese', nativeName: '日本語' },
+  ko: { name: 'Korean', nativeName: '한국어' },
+  zh: { name: 'Chinese', nativeName: '中文' },
+  ar: { name: 'Arabic', nativeName: 'العربية' },
 }
 
 // Get supported languages from dictionaries
