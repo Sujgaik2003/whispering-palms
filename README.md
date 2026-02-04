@@ -118,11 +118,16 @@ BITCOIN_WEBHOOK_SECRET=your_webhook_secret
 ANYTHINGLLM_API_URL=https://your-anythingllm-instance.com
 ANYTHINGLLM_API_KEY=your_anythingllm_api_key
 
-# Voice RSS TTS (For Flame/SuperFlame plans)
+# Voice TTS (For Flame/SuperFlame plans - Multilingual)
+# Primary: Google Cloud TTS (recommended - supports ALL languages)
+# Uses same credentials as Vision API - no extra setup needed!
+# Supports: Hindi, Arabic, Russian, Chinese, Korean, Japanese, and 70+ more languages
+# Free tier: 1 million characters/month (WaveNet) or 4 million (Standard)
+
+# Fallback: Voice RSS TTS (English only)
 VOICE_RSS_API_KEY=your_voice_rss_api_key
 VOICE_RSS_LANGUAGE=en-us
-VOICE_RSS_SPEED=0
-VOICE_RSS_VOICE=amy
+
 
 # Vision API (For Palm Image Analysis)
 GOOGLE_SERVICE_ACCOUNT_JSON={"type":"service_account","project_id":"..."}
@@ -309,12 +314,19 @@ Emails are automatically scheduled and sent via cron job.
 
 ### Internationalization (i18n)
 
-Supported languages:
-- English
-- Hindi
-- Spanish
-- French
-- German
+Supported languages (UI + Voice Narration):
+- 🇺🇸 English
+- 🇮🇳 Hindi (हिंदी)
+- 🇸🇦 Arabic (العربية)
+- 🇷🇺 Russian (Русский)
+- 🇨🇳 Chinese (中文)
+- 🇰🇷 Korean (한국어)
+- 🇯🇵 Japanese (日本語)
+- 🇪🇸 Spanish (Español)
+- 🇫🇷 French (Français)
+- 🇩🇪 German (Deutsch)
+- 🇮🇹 Italian (Italiano)
+- 🇧🇷 Portuguese (Português)
 
 Language switcher available in header.
 
