@@ -11,6 +11,7 @@
     "start": "next start",
     "lint": "next lint",
     "test:supabase": "tsx scripts/test-supabase.ts",
+    "test:telegram": "tsx scripts/test-telegram-bot.ts",
     "email:cron": "tsx scripts/email-cron-test.ts",
     "email:scheduler": "tsx scripts/start-email-scheduler.ts",
     "clean": "Remove-Item -Recurse -Force .next -ErrorAction SilentlyContinue",
