@@ -33,8 +33,8 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   // Protect dashboard and onboarding routes
-  if (request.nextUrl.pathname.startsWith('/dashboard') || 
-      request.nextUrl.pathname.startsWith('/onboarding')) {
+  if (request.nextUrl.pathname.startsWith('/dashboard') ||
+    request.nextUrl.pathname.startsWith('/onboarding')) {
     if (!user) {
       const url = request.nextUrl.clone()
       url.pathname = '/login'
@@ -44,9 +44,9 @@ export async function middleware(request: NextRequest) {
   }
 
   // Redirect authenticated users away from auth pages
-  if (request.nextUrl.pathname.startsWith('/login') || 
-      request.nextUrl.pathname.startsWith('/register') ||
-      request.nextUrl.pathname.startsWith('/forgot-password')) {
+  if (request.nextUrl.pathname.startsWith('/login') ||
+    request.nextUrl.pathname.startsWith('/register') ||
+    request.nextUrl.pathname.startsWith('/forgot-password')) {
     if (user) {
       const url = request.nextUrl.clone()
       url.pathname = '/dashboard'
@@ -65,8 +65,10 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      * - api/auth (auth API routes - don't protect these)
+     * - api/telegram (telegram bot webhooks and cron jobs)
+     * - api/email (email cron jobs)
      * - public files
      */
-    '/((?!_next/static|_next/image|favicon.ico|api/auth|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|api/auth|api/telegram|api/email|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
