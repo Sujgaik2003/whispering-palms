@@ -24,11 +24,12 @@ export async function POST(request: NextRequest) {
         const update = await request.json()
         console.log('[Telegram Webhook] Received update:', JSON.stringify(update, null, 2))
 
-        // Process update asynchronously to respond quickly
-        // Telegram expects a quick response
-        telegramBotService.handleUpdate(update).catch(error => {
+        // Process update
+        try {
+            await telegramBotService.handleUpdate(update)
+        } catch (error) {
             console.error('[Telegram Webhook] Handler error:', error)
-        })
+        }
 
         return NextResponse.json({ ok: true })
     } catch (error) {
