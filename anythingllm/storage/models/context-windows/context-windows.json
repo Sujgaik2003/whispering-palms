@@ -21,6 +21,8 @@
     "claude-opus-4-20250514": 200000,
     "claude-opus-4-5-20251101": 200000,
     "claude-opus-4-5": 200000,
+    "claude-opus-4-6": 200000,
+    "claude-opus-4-6-20260205": 200000,
     "claude-sonnet-4-20250514": 1000000
   },
   "openai": {
@@ -151,7 +153,13 @@
     "text-embedding-ada-002-v2": 8191,
     "text-moderation-007": 32768,
     "text-moderation-latest": 32768,
-    "text-moderation-stable": 32768
+    "text-moderation-stable": 32768,
+    "gpt-4o-mini-transcribe-2025-03-20": 16000,
+    "gpt-4o-mini-transcribe-2025-12-15": 16000,
+    "gpt-5-search-api": 272000,
+    "gpt-5-search-api-2025-10-14": 272000,
+    "gpt-realtime-mini-2025-10-06": 128000,
+    "gpt-realtime-mini-2025-12-15": 128000
   },
   "cohere": {
     "command-a-03-2025": 256000,
@@ -265,8 +273,8 @@
     "grok-vision-beta": 8192
   },
   "deepseek": {
-    "deepseek-chat": 128000,
-    "deepseek-reasoner": 128000,
+    "deepseek-chat": 131072,
+    "deepseek-reasoner": 131072,
     "deepseek-coder": 128000,
     "deepseek-r1": 65536,
     "deepseek-v3": 65536,

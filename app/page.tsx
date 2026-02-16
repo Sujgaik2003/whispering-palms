@@ -198,6 +198,16 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Disclaimer */}
+        <div className={`max-w-3xl mx-auto mb-12 sm:mb-16 px-4 transition-all duration-700 delay-[1500ms] ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <div className="bg-gold-50/80 backdrop-blur-sm border border-gold-300/50 rounded-xl p-4 sm:p-5 text-center">
+            <p className="text-text-tertiary text-[11px] sm:text-xs leading-relaxed">
+              <span className="font-semibold text-gold-600">⚠️ Disclaimer:</span>{' '}
+              The readings provided are predictions based on your stars and are <span className="font-semibold">not 100% accurate</span>. They are meant for guidance purposes only.
+            </p>
+          </div>
+        </div>
+
         <GlobalFooter />
       </div>
     </main>
