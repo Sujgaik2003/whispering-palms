@@ -7,8 +7,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createClient } from '@/lib/supabase/server'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-    apiVersion: '2025-02-24.acacia',
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_fallback_to_prevent_build_error', {
+    apiVersion: '2025-02-24.acacia' as any,
 })
 
 export async function GET(request: NextRequest) {
