@@ -44,7 +44,7 @@ export default function Home() {
                 {t('auth.signInLink')}
               </Link>
               <Link
-                href="/register"
+                href="/quiz"
                 className="group relative px-3 sm:px-5 md:px-6 py-1.5 sm:py-2.5 bg-gradient-to-r from-gold-500 to-gold-600 text-white rounded-lg sm:rounded-xl font-semibold text-[10px] sm:text-sm md:text-base tracking-wide transition-all duration-300 hover:scale-110 hover:shadow-soft-lg overflow-hidden whitespace-nowrap"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-gold-400 to-gold-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -169,7 +169,7 @@ export default function Home() {
           {/* CTA Buttons with enhanced animations */}
           <div className={`flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mb-12 sm:mb-20 px-2 transition-all duration-700 delay-1300 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <Link
-              href="/register"
+              href="/quiz"
               className="group relative w-full sm:w-auto px-8 sm:px-10 py-3 sm:py-4 bg-gradient-to-r from-gold-500 to-gold-600 text-white rounded-lg sm:rounded-xl font-semibold text-base sm:text-lg tracking-wide transition-all duration-500 hover:scale-110 hover:shadow-soft-xl sm:min-w-[200px] text-center overflow-hidden"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-gold-400 to-gold-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -177,7 +177,7 @@ export default function Home() {
                 <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
               </div>
               <span className="relative z-10 flex items-center justify-center gap-2">
-                {t('common.getStarted')}
+                🔮 {t('common.getStarted')}
                 <svg className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>

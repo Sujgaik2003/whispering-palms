@@ -4,13 +4,15 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getPaymentService } from '@/lib/services/payment/PaymentService'
-import { createClient } from '@/lib/supabase/server'
+import { headers } from 'next/headers'
 import Stripe from 'stripe'
+import { createClient } from '@/lib/supabase/server'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_dummy', {
   apiVersion: '2025-02-24.acacia',
 })
 
+// Webhook secret for verifying Stripe events
 export async function POST(request: NextRequest) {
   const body = await request.text()
   const signature = request.headers.get('stripe-signature')
