@@ -19,8 +19,10 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createClient()
 
+    let authData, authError;
+
     // Sign up with Supabase Auth
-    const { data: authData, error: authError } = await supabase.auth.signUp({
+    const signUpResult = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -31,12 +33,26 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    if (authError) {
+    authData = signUpResult.data;
+    authError = signUpResult.error;
+
+    // If signUp doesn't return an error but identities is empty, the user already exists!
+    if (authData.user && authData.user.identities && authData.user.identities.length === 0) {
+      // Attempt to sign them in with the password they provided instead
+      const signInResult = await supabase.auth.signInWithPassword({ email, password });
+
+      if (signInResult.error) {
+        return createErrorResponse('An account with this email already exists. The password provided is incorrect. Please log in.', 401);
+      }
+
+      authData = signInResult.data as any; // Cast to bypass strict TS error
+      authError = null;
+    } else if (authError) {
       return createErrorResponse(authError.message, 400)
     }
 
     if (!authData.user) {
-      return createErrorResponse('Failed to create user', 500)
+      return createErrorResponse('Failed to create or login user', 500)
     }
 
     // Create user record in custom users table
